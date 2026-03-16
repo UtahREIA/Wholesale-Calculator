@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport"/>
+<title>UTAH REIA - Wholesaler Calculator</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBv5v5ZA_pJvv_jT_ERUuXAQbG0xBqOWRY&libraries=places"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ===================== TOKENS ===================== */
+:root{
+  --blue:#1a2a4f; --gold:#D4AF37; --green:#2E8B57;
+  --muted:#666; --border:#e7e7e7; --bg:#f6f7f8;
+  --card:#fff; --radius:12px; --maxw:1100px;
+  /* touch-friendly sizing */
+  --input-h:48px; --btn-h:48px; --tap:44px;
+}
+/* ===================== RESET ===================== */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:Inter,system-ui,-apple-system,sans-serif;margin:0;background:var(--bg);color:#111;-webkit-text-size-adjust:100%}
+
+/* ===================== LAYOUT ===================== */
+.wrap{max-width:var(--maxw);margin:0 auto;padding:16px;background:var(--card)}
+@media(min-width:600px){.wrap{margin:16px auto;border-radius:var(--radius);box-shadow:0 20px 60px rgba(10,20,30,0.07);padding:20px}}
+
+/* ===================== HEADER ===================== */
+.top{display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.top img{height:56px}
+@media(min-width:600px){.top img{height:68px}}
+h1{color:var(--blue);font-size:17px;font-weight:700;margin:4px 0 2px;text-align:center;line-height:1.3}
+@media(min-width:600px){h1{font-size:20px}}
+.subtitle{text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px;line-height:1.5}
+@media(min-width:600px){.subtitle{font-size:14px}}
+
+/* ===================== STEP INDICATOR ===================== */
+.step-card{background:var(--card);padding:12px 16px;border-radius:10px;margin-bottom:10px;box-shadow:0 4px 16px rgba(0,0,0,0.04)}
+.step-ind{color:var(--green);font-weight:800;text-align:center;font-size:14px}
+/* progress bar */
+.progress-wrap{margin-top:8px;background:#eee;border-radius:999px;height:6px;overflow:hidden}
+.progress-bar{background:var(--green);height:100%;border-radius:999px;transition:width 0.3s ease}
+
+/* ===================== CARDS ===================== */
+.card{background:var(--card);padding:14px;border-radius:10px;margin-bottom:10px;box-shadow:0 4px 20px rgba(0,0,0,0.04)}
+@media(min-width:600px){.card{padding:16px;border-radius:var(--radius);margin-bottom:12px}}
+.card-title{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:0.6px;font-weight:600;margin-bottom:12px}
+
+/* ===================== FORM GRID ===================== */
+/* Mobile: single column by default */
+.row{display:grid;grid-template-columns:1fr;gap:10px}
+/* Tablet 2-col */
+@media(min-width:540px){.row{grid-template-columns:1fr 1fr}}
+/* Desktop 4-col for address */
+@media(min-width:900px){.row-4{grid-template-columns:1fr 1fr 1fr 1fr}}
+@media(min-width:540px) and (max-width:899px){.row-4{grid-template-columns:1fr 1fr}}
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:400px){.row-2{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:5px}
+
+/* ===================== LABELS & INPUTS ===================== */
+label{font-weight:600;color:var(--blue);font-size:13px;display:block}
+input[type="text"],input[type="number"],select,textarea{
+  width:100%;height:var(--input-h);padding:0 12px;
+  border-radius:8px;border:1.5px solid var(--border);
+  font-size:16px; /* 16px prevents iOS zoom */
+  font-family:inherit;color:#111;background:#fff;
+  -webkit-appearance:none;appearance:none;
+  transition:border-color 0.15s;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue)}
+textarea{height:auto;min-height:72px;padding:10px 12px;resize:vertical}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+
+/* ===================== BUTTONS ===================== */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:var(--btn-h);padding:0 18px;
+  border-radius:10px;border:none;
+  font-family:inherit;font-size:15px;font-weight:700;
+  cursor:pointer;transition:opacity 0.15s,transform 0.1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn:active{opacity:0.85;transform:scale(0.98)}
+.btn-primary{background:var(--green);color:#fff}
+.btn-secondary{background:#eaeaea;color:var(--blue)}
+.btn-full{width:100%}
+/* Legacy .btn class compat */
+.btn.secondary{background:#eaeaea;color:var(--blue)}
+
+/* ===================== NAV BUTTONS ===================== */
+.nav{
+  position:sticky;bottom:0;left:0;right:0;
+  background:#fff;
+  border-top:1px solid var(--border);
+  padding:10px 16px;
+  padding-bottom:calc(10px + env(safe-area-inset-bottom));
+  display:flex;gap:10px;justify-content:space-between;
+  z-index:100;
+  margin:0 -16px;
+}
+@media(min-width:600px){
+  .nav{position:static;border-top:none;padding:0;margin:0;margin-top:12px}
+}
+.nav .btn{flex:1;font-size:15px}
+.nav .btn-back{max-width:100px}
+@media(min-width:600px){.nav .btn-back{max-width:130px}}
+
+/* ===================== PENCIL TOGGLE ===================== */
+.pencil{
+  display:inline-flex;align-items:center;gap:8px;
+  cursor:pointer;border:1.5px solid var(--border);
+  padding:10px 14px;border-radius:8px;background:#fff;
+  font-family:inherit;font-size:14px;font-weight:600;color:var(--blue);
+  width:100%;justify-content:center;
+  min-height:var(--tap);
+}
+@media(min-width:600px){.pencil{width:auto;justify-content:flex-start}}
+
+/* ===================== EDITOR ===================== */
+.editor{display:none;margin-top:10px;padding:12px;border-radius:10px;background:#fbfbfb;border:1px solid #ebebeb}
+/* Each editor row stacks on mobile */
+.editor .item{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:6px;
+  margin-bottom:10px;
+  padding-bottom:10px;
+  border-bottom:1px solid #f0f0f0;
+}
+.editor .item:last-of-type{border-bottom:none}
+@media(min-width:540px){
+  .editor .item{grid-template-columns:1fr 100px 140px auto;align-items:center;gap:8px;border-bottom:none;padding-bottom:0;margin-bottom:8px}
+}
+.editor .item input[type=text],.editor .item input.item-label{height:40px;font-size:14px}
+.editor .item input.item-value,.editor .item .small-input{height:40px;font-size:14px;width:100%}
+@media(min-width:540px){.editor .item .small-input{width:100px}}
+.editor .item select{height:40px;font-size:14px}
+.editor .item-label-wrap{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:2px}
+@media(min-width:540px){.editor .item-label-wrap{display:none}}
+.editor .row-actions{
+  display:flex;flex-direction:column;gap:8px;
+  margin-top:12px;padding-top:12px;border-top:1px solid #ebebeb;
+}
+@media(min-width:540px){
+  .editor .row-actions{flex-direction:row;justify-content:flex-end;align-items:center}
+}
+.total-display{font-weight:700;font-size:15px;text-align:center}
+@media(min-width:540px){.total-display{text-align:left}}
+.icon-btn{
+  background:none;border:0;
+  width:var(--tap);height:var(--tap);
+  display:inline-flex;align-items:center;justify-content:center;
+  font-size:18px;cursor:pointer;border-radius:8px;
+  align-self:flex-end;
+}
+@media(min-width:540px){.icon-btn{align-self:center}}
+
+/* ===================== TOGGLE SWITCH ===================== */
+.switch{position:relative;display:inline-block;width:52px;height:28px;flex-shrink:0}
+.switch input{display:none}
+.slider{position:absolute;cursor:pointer;inset:0;background:#ccc;transition:.2s;border-radius:999px}
+.slider:before{position:absolute;content:"";height:20px;width:20px;left:4px;top:4px;background:#fff;transition:.2s;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,0.15)}
+input:checked+.slider{background:var(--green)}
+input:checked+.slider:before{transform:translateX(24px)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
+.toggle-label{display:flex;align-items:center;gap:10px;font-weight:600;color:var(--blue);font-size:14px;cursor:pointer}
+.muted-small{color:var(--muted);font-size:12px;line-height:1.4}
+
+/* ===================== BUYER TOGGLE ===================== */
+.buyer-toggle{display:grid;grid-template-columns:1fr 1fr;border-radius:10px;overflow:hidden;border:1.5px solid var(--border);margin-top:6px}
+.buyer-toggle button{
+  padding:13px 8px;border:none;background:#f5f5f5;
+  font-family:inherit;font-size:14px;font-weight:600;
+  cursor:pointer;color:var(--blue);transition:background 0.15s,color 0.15s;
+  min-height:var(--tap);
+}
+.buyer-toggle button.active{background:var(--blue);color:#fff}
+
+/* ===================== MAO BAR ===================== */
+.mao-bar{
+  background:var(--blue);border-radius:10px;
+  padding:14px 12px;margin-top:12px;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+@media(min-width:500px){.mao-bar{grid-template-columns:repeat(4,1fr)}}
+.mao-item{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
+.mao-label{font-size:10px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+.mao-value{font-size:16px;font-weight:700;color:var(--gold);line-height:1.2}
+@media(min-width:500px){.mao-value{font-size:18px}}
+.mao-item.highlight .mao-value{font-size:20px}
+@media(min-width:500px){.mao-item.highlight .mao-value{font-size:24px}}
+
+/* ===================== RESULTS ===================== */
+.results{margin-top:12px;padding:14px;border-radius:10px;background:linear-gradient(160deg,rgba(26,42,79,0.97),rgba(26,42,79,0.92));color:#fff}
+.results h3{margin:0 0 10px;font-size:16px}
+.results .line{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.07);font-size:14px;gap:8px}
+.results .line div:last-child{font-weight:600;white-space:nowrap}
+
+/* ===================== CHARTS ===================== */
+.charts{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+@media(min-width:700px){.charts{grid-template-columns:1fr 1fr}}
+.chart-card{background:#fff;padding:12px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.05)}
+.chart-card h4{margin:0 0 8px;font-size:14px;color:var(--blue);font-weight:700}
+
+/* ===================== BREAKDOWN CARD ===================== */
+.breakdown-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;font-size:14px;gap:8px;border-bottom:1px solid #f0f0f0}
+.breakdown-row:last-child{border-bottom:none}
+.breakdown-row.total{font-weight:800;font-size:16px;padding-top:10px;border-top:2px solid var(--blue);border-bottom:none;margin-top:4px}
+
+/* ===================== MISC ===================== */
+.subheading{font-weight:700;margin:8px 0 6px;color:var(--blue);font-size:13px}
+.small-note{font-size:12px;color:var(--muted);line-height:1.5}
+.finish-notice{background:#fff3cd;border:1px solid #ffc107;color:#856404;padding:12px;border-radius:8px;margin:0 0 14px;text-align:center;font-weight:600;font-size:14px;line-height:1.5}
+.holding-total-note{margin-top:8px;font-size:13px;color:#333;line-height:1.6}
+.step{display:none;opacity:0;transition:opacity 200ms ease}
+.step.active{display:block;opacity:1}
+/* bottom padding for sticky nav */
+#stepsArea{padding-bottom:4px}
+@media(max-width:599px){#stepsArea{padding-bottom:70px}}
+/* loom video */
+.video-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:8px;margin-top:8px}
+.video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+/* Breakdown text note */
+.breakdown-note{font-size:12px;color:var(--muted);margin-top:4px}
+/* Add item btn */
+.add-item-btn{margin-top:8px;width:100%}
+@media(min-width:540px){.add-item-btn{width:auto}}
+</style>
+</head>
+<body>
+
+<div class="wrap" id="calcWrap">
+
+  <!-- HEADER -->
+  <div class="top"><img alt="UTAH REIA logo" src="https://assets.cdn.filesafe.space/DNirEjy0ejVwbHsaBYrn/media/682f680ec314718407baed82.png"/></div>
+  <h1>UTAH REIA Wholesaler Calculator</h1>
+  <div class="subtitle">Find your MAO, wholesale fee, and generate a professional report for cash buyers.</div>
+
+  <!-- STEP INDICATOR -->
+  <div class="step-card">
+    <div class="step-ind" id="stepIndicator">Step 1 of 9</div>
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:11.1%"></div></div>
+  </div>
+
+  <div id="stepsArea">
+
+    <!-- ═══════════ STEP 1: Property Info ═══════════ -->
+    <div class="card step active" data-step="1">
+      <div class="card-title">Property Information</div>
+      <div class="row row-4" style="margin-bottom:10px">
+        <div class="field"><label>Street Address</label><input id="street" placeholder="Start typing…" type="text" autocomplete="street-address"/></div>
+        <div class="field"><label>City</label><input id="city" placeholder="City" type="text"/></div>
+        <div class="field"><label>State</label><input id="state" placeholder="UT" type="text"/></div>
+        <div class="field"><label>ZIP Code</label><input id="zip" placeholder="84101" type="text" inputmode="numeric"/></div>
+      </div>
+      <div class="row" style="margin-bottom:10px">
+        <div class="field"><label>Bedrooms</label><select id="beds"><option value="">—</option><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6+</option></select></div>
+        <div class="field"><label>Bathrooms</label><select id="baths"><option value="">—</option><option>1</option><option>1.5</option><option selected>2</option><option>2.5</option><option>3</option><option>3.5</option><option>4+</option></select></div>
+        <div class="field"><label>Square Footage <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="squareFootage" placeholder="e.g. 1,500" type="number" min="0" inputmode="decimal"/></div>
+        <div class="field"><label>Year Built <span style="font-weight:400;color:var(--muted)">(optional)</span></label><input id="yearBuilt" placeholder="e.g. 1985" type="number" inputmode="numeric"/></div>
+      </div>
+      <div class="field"><label>Features / Description <span style="font-weight:400;color:var(--muted)">(optional)</span></label><textarea id="features" placeholder="3 bed / 2 bath, corner lot, ARV comps…"></textarea></div>
+    </div>
+
+    <!-- ═══════════ STEP 2: Estimates & Buyer Type ═══════════ -->
+    <div class="card step" data-step="2">
+      <div class="card-title">Estimates &amp; Buyer Type</div>
+
+      <label style="margin-bottom:6px;display:block">Selling To (Cash Buyer Type)</label>
+      <div class="buyer-toggle" style="margin-bottom:14px">
+        <button type="button" id="btnFlipper" class="active" onclick="setBuyerType('flipper')">🔨 House Flipper</button>
+        <button type="button" id="btnRental" onclick="setBuyerType('rental')">🏘️ Rental Investor</button>
+      </div>
+
+      <div class="row" style="margin-bottom:10px">
+        <div class="field"><label>After Repair Value (ARV)</label><input id="arv" inputmode="decimal" placeholder="$350,000" type="text"/></div>
+        <div class="field"><label>Your Desired Wholesale Fee</label><input id="wholesaleFee" inputmode="decimal" placeholder="$10,000" type="text"/></div>
+      </div>
+
+      <!-- Flipper -->
+      <div id="flipperFields">
+        <div class="row">
+          <div class="field"><label>Flipper's Desired Profit ($)</label><input id="flipperProfit" inputmode="decimal" placeholder="$30,000" type="text"/></div>
+          <div class="field"><label>— or — Profit (% of ARV)</label><input id="flipperProfitPct" type="number" min="0" step="0.1" placeholder="e.g. 15" inputmode="decimal"/></div>
+        </div>
+      </div>
+
+      <!-- Rental -->
+      <div id="rentalFields" style="display:none">
+        <div class="row" style="margin-bottom:10px">
+          <div class="field"><label>Gross Monthly Rent</label><input id="grossRent" inputmode="decimal" placeholder="$2,000" type="text"/></div>
+          <div class="field"><label>Buyer's Desired CoC Return (%)</label><input id="cocReturn" type="number" min="0" step="0.1" placeholder="8" inputmode="decimal"/></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>Vacancy Rate (%)</label><input id="vacancyRate" type="number" min="0" step="0.1" value="5" inputmode="decimal"/></div>
+          <div class="field"><label>Monthly Operating Expenses</label><input id="opEx" inputmode="decimal" placeholder="$500" type="text"/></div>
+        </div>
+      </div>
+
+      <div style="margin-top:14px">
+        <label style="margin-bottom:6px;display:block">How to Estimate ARV — Video</label>
+        <div class="video-wrap">
+          <iframe src="https://www.loom.com/embed/393dcac19b484e07aaadcd6271864f4d" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ STEP 3: Deal Structure & EMD ═══════════ -->
+    <div class="card step" data-step="3">
+      <div class="card-title">Deal Structure &amp; Earnest Money</div>
+
+      <div class="row" style="margin-bottom:10px">
+        <div class="field">
+          <label>Deal / Exit Strategy</label>
+          <select id="dealType">
+            <option value="assignment">Assignment of Contract</option>
+            <option value="double_close">Double Close</option>
+          </select>
+          <div class="muted-small" style="margin-top:4px">Assignment = assign contract to buyer. Double Close = you briefly take title then resell.</div>
+        </div>
+        <div class="field">
+          <label>Earnest Money Deposit (EMD)</label>
+          <input id="emd" inputmode="decimal" placeholder="$1,000" type="text"/>
+          <div class="muted-small" style="margin-top:4px">Cash you put up to secure the contract. Included in your cash-to-close.</div>
+        </div>
+      </div>
+
+      <div class="row" style="margin-bottom:10px">
+        <div class="field">
+          <label>Assignment Fee / Wholesale Fee <span style="font-weight:400;color:var(--muted)">(pre-filled from Step 2)</span></label>
+          <input id="assignmentFeeDisplay" type="text" readonly style="background:#f8f9fb;font-weight:700;color:var(--blue)"/>
+          <div class="muted-small" style="margin-top:4px">This is your profit on the deal.</div>
+        </div>
+        <div class="field" id="doublecloseExtraWrap" style="display:none">
+          <label>Double Close Transaction Costs</label>
+          <input id="doubleCloseCost" inputmode="decimal" placeholder="$1,500" type="text"/>
+          <div class="muted-small" style="margin-top:4px">Extra title/escrow/legal fees for the A-B and B-C closings.</div>
+        </div>
+      </div>
+
+      <!-- 70% Rule Quick Check -->
+      <div style="background:#f0f8f4;border:1.5px solid #b2dfcc;border-radius:10px;padding:14px;margin-top:6px">
+        <div style="font-weight:700;color:var(--blue);font-size:13px;margin-bottom:10px">⚡ 70% Rule Quick Check</div>
+        <div class="row">
+          <div class="field">
+            <label>70% Rule MAO <span style="font-weight:400;color:var(--muted)">(auto-calculated)</span></label>
+            <input id="rule70Mao" type="text" readonly style="background:#fff;font-weight:700;color:var(--green)"/>
+            <div class="muted-small" style="margin-top:4px">Formula: (ARV × 70%) – Repairs</div>
+          </div>
+          <div class="field">
+            <label>Your MAO <span style="font-weight:400;color:var(--muted)">(from your inputs)</span></label>
+            <input id="rule70YourMao" type="text" readonly style="background:#fff;font-weight:700;color:var(--blue)"/>
+            <div class="muted-small" style="margin-top:4px">Compared against the 70% rule above.</div>
+          </div>
+        </div>
+        <div id="rule70Verdict" style="margin-top:10px;font-size:13px;font-weight:600;padding:8px 12px;border-radius:6px;background:#fff"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════ STEP 4: Repair Costs ═══════════ -->
+    <div class="card step" data-step="4">
+      <div class="card-title">Repair / Rehab Costs</div>
+      <div class="field" style="margin-bottom:10px">
+        <label>Repair Costs (Total)</label>
+        <input id="repairs" placeholder="$25,000" type="text" inputmode="decimal"/>
+      </div>
+      <div class="toggle-row">
+        <label class="toggle-label" for="rehabManualToggle">
+          <label class="switch"><input id="rehabManualToggle" type="checkbox"/><span class="slider"></span></label>
+          Manual only (skip itemized)
+        </label>
+      </div>
+      <div class="muted-small" style="margin-bottom:10px">OFF = use itemized breakdown below.</div>
+      <button class="pencil" onclick="toggleEditor('rehab')" type="button">✏️ Edit Repair Breakdown</button>
+      <div aria-hidden="true" class="editor" id="editor-rehab">
+        <div class="subheading">Itemized Repair Costs</div>
+
+        <div class="subheading" style="font-size:11px;color:var(--muted);margin-top:6px">EXTERIOR</div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Roof" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Foundation" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Siding" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Gutters / Soffit" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Garage" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Landscaping" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Exterior Paint" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Decks / Porches" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+
+        <div class="subheading" style="font-size:11px;color:var(--muted);margin-top:8px">INTERIOR</div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Plumbing" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Electrical" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="HVAC" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Flooring" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Cabinets / Countertops" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Interior Paint" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Sheetrock / Drywall" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Windows / Doors" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+
+        <div class="subheading" style="font-size:11px;color:var(--muted);margin-top:8px">GENERAL</div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Permits" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Termites / Mold" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item name</div><input class="item-label" value="Miscellaneous" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+
+        <div id="rehab-add-area"></div>
+        <button class="btn btn-secondary add-item-btn" onclick="addItem('rehab')" type="button">+ Add Item</button>
+        <div class="row-actions">
+          <div class="total-display">Repair Total: <span id="rehabEditorTotal">$0</span></div>
+          <div style="display:flex;gap:8px;width:100%">
+            <button class="btn btn-secondary" style="flex:1" onclick="cancelEditor('rehab')" type="button">Cancel</button>
+            <button class="btn btn-primary" style="flex:1" onclick="saveEditor('rehab')" type="button">Save</button>
+          </div>
+        </div>
+      </div>
+      <div id="rehabBreakdown" class="breakdown-note"></div>
+    </div>
+
+    <!-- ═══════════ STEP 4: Purchase Closing Costs ═══════════ -->
+    <div class="card step" data-step="5">
+      <div class="card-title">Purchase Closing Costs</div>
+      <div class="field" style="margin-bottom:10px">
+        <label>Purchase Closing Cost (total)</label>
+        <input id="purchaseClosing" placeholder="$3,000" type="text" inputmode="decimal"/>
+      </div>
+      <div class="toggle-row">
+        <label class="toggle-label" for="purchaseManualToggle">
+          <label class="switch"><input id="purchaseManualToggle" type="checkbox"/><span class="slider"></span></label>
+          Manual only
+        </label>
+        <span class="muted-small">OFF = use itemized editor</span>
+      </div>
+      <button class="pencil" style="margin-top:10px" onclick="toggleEditor('purchase')" type="button">✏️ Edit Breakdown</button>
+      <div aria-hidden="true" class="editor" id="editor-purchase">
+        <div class="subheading">Itemized Purchase Costs</div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="Appraisal" type="text"/><div class="item-label-wrap">Amount</div><input class="item-value small-input" data-kind="fixed" value="500" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="Inspection" type="text"/><div class="item-label-wrap">Amount</div><input class="item-value small-input" data-kind="fixed" value="400" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="Title &amp; Escrow" type="text"/><div class="item-label-wrap">Amount (%)</div><input class="item-value small-input" data-kind="pct_price" value="1.5" inputmode="decimal"/><select class="item-kind"><option value="fixed">$ Fixed</option><option selected value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="Doc Fees" type="text"/><div class="item-label-wrap">Amount</div><input class="item-value small-input" data-kind="fixed" value="500" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="Recording Fees" type="text"/><div class="item-label-wrap">Amount</div><input class="item-value small-input" data-kind="fixed" value="250" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="Sewer Scope" type="text"/><div class="item-label-wrap">Amount</div><input class="item-value small-input" data-kind="fixed" value="100" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="Meth Test" type="text"/><div class="item-label-wrap">Amount</div><input class="item-value small-input" data-kind="fixed" value="100" inputmode="decimal"/><select class="item-kind"><option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="Property Insurance" type="text"/><div class="item-label-wrap">Amount (%)</div><input class="item-value small-input" data-kind="pct_price" value="0.4" inputmode="decimal"/><select class="item-kind"><option value="fixed">$ Fixed</option><option selected value="pct_price">% of ARV</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div id="purchase-add-area"></div>
+        <button class="btn btn-secondary add-item-btn" onclick="addItem('purchase')" type="button">+ Add Item</button>
+        <div class="row-actions">
+          <div class="total-display">Total Upfront: <span id="purchaseEditorTotal">$0</span></div>
+          <div style="display:flex;gap:8px;width:100%">
+            <button class="btn btn-secondary" style="flex:1" onclick="cancelEditor('purchase')" type="button">Cancel</button>
+            <button class="btn btn-primary" style="flex:1" onclick="saveEditor('purchase')" type="button">Save</button>
+          </div>
+        </div>
+      </div>
+      <div id="purchaseBreakdown" class="breakdown-note"></div>
+    </div>
+
+    <!-- ═══════════ STEP 5: Holding Costs ═══════════ -->
+    <div class="card step" data-step="6">
+      <div class="card-title">Monthly Holding Costs</div>
+      <div class="subheading">Costs During Rehab Period</div>
+      <div class="row" style="margin-bottom:10px">
+        <div class="field">
+          <label>Monthly Holding (Manual Base)</label>
+          <input id="holdingMonthly" placeholder="$1,200" type="text" inputmode="decimal"/>
+        </div>
+        <div class="field">
+          <label>Days to Rehab &amp; Sell</label>
+          <input id="holdingDays" type="number" value="90" min="1" step="1" inputmode="numeric"/>
+        </div>
+      </div>
+      <div class="toggle-row">
+        <label class="toggle-label" for="holdingManualToggle">
+          <label class="switch"><input id="holdingManualToggle" type="checkbox"/><span class="slider"></span></label>
+          Manual Only
+        </label>
+      </div>
+      <button class="pencil" style="margin-top:10px" onclick="toggleEditor('holding')" type="button">✏️ Edit Monthly Items</button>
+      <div aria-hidden="true" class="editor" id="editor-holding">
+        <div class="subheading">Monthly Holding Items</div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="Property Tax" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-type"><option selected value="fixed">$ Fixed</option></select><select class="item-freq"><option selected value="per_month">Per Month</option><option value="per_year">Per Year</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="Insurance" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-type"><option selected value="fixed">$ Fixed</option></select><select class="item-freq"><option selected value="per_month">Per Month</option><option value="per_year">Per Year</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="Utilities" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="150" inputmode="decimal"/><select class="item-type"><option selected value="fixed">$ Fixed</option></select><select class="item-freq"><option selected value="per_month">Per Month</option><option value="per_year">Per Year</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="HOA" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="0" inputmode="decimal"/><select class="item-type"><option selected value="fixed">$ Fixed</option></select><select class="item-freq"><option selected value="per_month">Per Month</option><option value="per_year">Per Year</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div id="holding-add-area"></div>
+        <button class="btn btn-secondary add-item-btn" onclick="addItem('holding')" type="button">+ Add Item</button>
+        <div class="row-actions">
+          <div class="total-display">Monthly Extras: <span id="holdingEditorTotal">$0</span></div>
+          <div style="display:flex;gap:8px;width:100%">
+            <button class="btn btn-secondary" style="flex:1" onclick="cancelEditor('holding')" type="button">Cancel</button>
+            <button class="btn btn-primary" style="flex:1" onclick="saveEditor('holding')" type="button">Save</button>
+          </div>
+        </div>
+      </div>
+      <div id="holdingBreakdown" class="breakdown-note"></div>
+      <div class="holding-total-note"><strong>Total Holding (<span id="holdDaysDisplay">90</span> days / <span id="holdMonthsDisplay">3.0</span> mo):</strong> <span id="holdingTotalDisplay">$0</span></div>
+    </div>
+
+    <!-- ═══════════ STEP 6: Sale Costs ═══════════ -->
+    <div class="card step" data-step="7">
+      <div class="card-title">Sale Costs</div>
+      <button class="pencil" onclick="toggleEditor('sales')" type="button">✏️ Edit Sale Costs</button>
+      <div class="muted-small" style="margin-top:6px">Defaults: agent commissions, title &amp; escrow.</div>
+      <div aria-hidden="true" class="editor" id="editor-sales">
+        <div class="subheading">Sales Cost Breakdown (one-time)</div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="Sales Agent Commission" type="text"/><div class="item-label-wrap">Amount (%)</div><input class="item-value small-input" data-kind="pct_arv" value="3" inputmode="decimal"/><select class="item-kind"><option selected value="pct_arv">% of ARV</option><option value="fixed">$ Fixed</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="Buyer's Agent Commission" type="text"/><div class="item-label-wrap">Amount (%)</div><input class="item-value small-input" data-kind="pct_arv" value="3" inputmode="decimal"/><select class="item-kind"><option selected value="pct_arv">% of ARV</option><option value="fixed">$ Fixed</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div class="item"><div class="item-label-wrap">Item</div><input class="item-label" value="Title &amp; Escrow (Sale)" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" data-kind="fixed" value="400" inputmode="decimal"/><select class="item-kind"><option value="pct_arv">% of ARV</option><option selected value="fixed">$ Fixed</option></select><button class="icon-btn" type="button" aria-label="Delete">🗑️</button></div>
+        <div id="sales-add-area"></div>
+        <button class="btn btn-secondary add-item-btn" onclick="addItem('sales')" type="button">+ Add Item</button>
+        <div class="row-actions">
+          <div class="total-display">Sales Total: <span id="salesEditorTotal">$0</span></div>
+          <div style="display:flex;gap:8px;width:100%">
+            <button class="btn btn-secondary" style="flex:1" onclick="cancelEditor('sales')" type="button">Cancel</button>
+            <button class="btn btn-primary" style="flex:1" onclick="saveEditor('sales')" type="button">Save</button>
+          </div>
+        </div>
+      </div>
+      <div id="salesBreakdown" class="breakdown-note"></div>
+    </div>
+
+    <!-- ═══════════ STEP 7: Live MAO Preview ═══════════ -->
+    <div class="card step" data-step="8">
+      <div class="card-title">Deal Summary &amp; MAO Preview</div>
+      <div class="subheading">Review your numbers before generating the final report</div>
+
+      <div class="row" style="margin-bottom:10px">
+        <div class="field"><label>ARV</label><input id="arvPreview" type="text" readonly style="background:#f8f9fb;font-weight:700;color:var(--blue)"/></div>
+        <div class="field"><label>Your Wholesale Fee</label><input id="feePreview" type="text" readonly style="background:#f8f9fb;font-weight:700;color:var(--blue)"/></div>
+      </div>
+      <div class="row" style="margin-bottom:10px">
+        <div class="field"><label>Total Repairs</label><input id="repairsPreview" type="text" readonly style="background:#f8f9fb"/></div>
+        <div class="field"><label>Purchase Closing</label><input id="closingPreview" type="text" readonly style="background:#f8f9fb"/></div>
+      </div>
+      <div class="row" style="margin-bottom:6px">
+        <div class="field"><label>Total Holding</label><input id="holdingPreview" type="text" readonly style="background:#f8f9fb"/></div>
+        <div class="field"><label>Sale Costs</label><input id="salesPreview" type="text" readonly style="background:#f8f9fb"/></div>
+      </div>
+
+      <div class="mao-bar">
+        <div class="mao-item"><div class="mao-label">ARV</div><div class="mao-value" id="barArv">—</div></div>
+        <div class="mao-item"><div class="mao-label">Total Costs</div><div class="mao-value" id="barCosts">—</div></div>
+        <div class="mao-item"><div class="mao-label">Wholesale Fee</div><div class="mao-value" id="barFee">—</div></div>
+        <div class="mao-item highlight"><div class="mao-label">MAO (Max Offer)</div><div class="mao-value" id="barMao">—</div></div>
+      </div>
+    </div>
+
+    <!-- ═══════════ STEP 8: Report ═══════════ -->
+    <div class="card step" data-step="9">
+      <div class="card-title">Analysis Report</div>
+      <div class="finish-notice">⚠️ <strong>Important:</strong> Always click "Finish Analysis" after making any changes to update your report.</div>
+      <button class="btn btn-primary btn-full" id="finishAnalysisBtn" type="button" style="font-size:16px;height:52px;margin-bottom:16px">📊 Finish Analysis</button>
+      <div id="reportContainer">
+        <p style="text-align:center;color:var(--muted);padding:20px 0">Your analysis report will appear here.</p>
+      </div>
+    </div>
+
+  </div><!-- /stepsArea -->
+
+  <!-- STICKY NAV -->
+  <div class="nav" id="navButtons">
+    <button class="btn btn-secondary btn-back" id="prevBtn" type="button" style="display:none">← Back</button>
+    <button class="btn btn-primary" id="nextBtn" type="button" style="flex:1">Next →</button>
+  </div>
+
+  <div style="text-align:center;margin-top:14px;color:var(--muted);font-size:12px;padding-bottom:8px">© 2025 UTAH REIA — Estimates are educational only.</div>
+</div><!-- /wrap -->
+
+<script>
+/* ==================== STATE ==================== */
+const editorState = {
+  rehabExtras:0, rehabManualBase:0, rehabManualOnly:false,
+  purchaseExtrasUpfront:0, purchaseManualBase:0, purchaseManualOnly:false,
+  holdingMonthlyBase:0, holdingMonthlyExtras:0, holdingManualOnly:false,
+  salesExtras:0,
+  rentalMaxAllIn:0, rentalAnnualNOI:0
+};
+let buyerType='flipper';
+let chart1=null, chart2=null, chart3=null;
+
+/* ==================== HELPERS ==================== */
+const $=id=>document.getElementById(id);
+function uc(s){if(s===undefined||s===null)return 0;if(typeof s==='number')return s;s=String(s);if(!s)return 0;return Number(s.replace(/[^0-9.-]+/g,''))||0;}
+function fc(n){if(isNaN(n))n=0;return '$'+Math.round(n).toLocaleString();}
+function escapeHtml(s){if(!s)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#x27;');}
+function debounce(fn,w){let t;return function(...a){clearTimeout(t);t=setTimeout(()=>fn.apply(this,a),w);};}
+
+/* ==================== BUYER TYPE ==================== */
+function setBuyerType(type){
+  buyerType=type;
+  $('btnFlipper').classList.toggle('active',type==='flipper');
+  $('btnRental').classList.toggle('active',type==='rental');
+  $('flipperFields').style.display=type==='flipper'?'':'none';
+  $('rentalFields').style.display=type==='rental'?'':'none';
+  updateStep7Preview();
+}
+
+/* ==================== GOOGLE AUTOCOMPLETE ==================== */
+function initAutocomplete(){
+  try{
+    if(!window.google||!google.maps||!google.maps.places)throw new Error('not ready');
+    const input=$('street');if(!input)return;
+    const ac=new google.maps.places.Autocomplete(input,{componentRestrictions:{country:'us'},types:['address']});
+    ac.addListener('place_changed',()=>{
+      const place=ac.getPlace();if(!place||!place.address_components)return;
+      let num='',route='',city='',state='',postal='';
+      place.address_components.forEach(c=>{
+        if(c.types.includes('street_number'))num=c.long_name;
+        if(c.types.includes('route'))route=c.long_name;
+        if(c.types.includes('locality')||c.types.includes('sublocality'))city=c.long_name;
+        if(c.types.includes('administrative_area_level_1'))state=c.short_name;
+        if(c.types.includes('postal_code'))postal=c.long_name;
+      });
+      if(num||route)$('street').value=(num+' '+route).trim();
+      if(city)$('city').value=city;
+      if(state)$('state').value=state;
+      if(postal)$('zip').value=postal;
+    });
+  }catch(e){setTimeout(initAutocomplete,1000);}
+}
+document.addEventListener('DOMContentLoaded',initAutocomplete);
+setTimeout(initAutocomplete,1200);
+
+/* ==================== NAVIGATION ==================== */
+const TOTAL_STEPS=9;
+let currentStep=1;
+
+function showStep(n){
+  currentStep=Math.max(1,Math.min(TOTAL_STEPS,n));
+  document.querySelectorAll('.step').forEach(el=>el.classList.toggle('active',Number(el.dataset.step)===currentStep));
+  $('stepIndicator').textContent=`Step ${currentStep} of ${TOTAL_STEPS}`;
+  $('progressBar').style.width=((currentStep/TOTAL_STEPS)*100)+'%';
+  $('prevBtn').style.display=currentStep===1?'none':'inline-flex';
+  $('nextBtn').style.display=currentStep===TOTAL_STEPS?'none':'inline-flex';
+  $('nextBtn').textContent='Next →';
+  if(currentStep===8)updateStep7Preview();
+  if(currentStep===3)updateStep3();
+  // Scroll to top of wrap smoothly
+  try{$('calcWrap').scrollIntoView({behavior:'smooth',block:'start'});}catch(e){}
+}
+
+// Nav listeners are attached in window.addEventListener('load') below
+
+/* ==================== EDITOR TOGGLE / CANCEL ==================== */
+function toggleEditor(key){
+  const el=$('editor-'+key);
+  const hidden=el.getAttribute('aria-hidden')==='true';
+  el.style.display=hidden?'block':'none';
+  el.setAttribute('aria-hidden',!hidden);
+  if(hidden){recalcEditor(key);try{el.scrollIntoView({behavior:'smooth',block:'nearest'});}catch(e){}}
+}
+function cancelEditor(key){
+  const el=$('editor-'+key);
+  el.style.display='none';el.setAttribute('aria-hidden','true');
+}
+
+/* ==================== ADD ITEM ==================== */
+function addItem(key){
+  const area=$(key+'-add-area');if(!area)return;
+  const div=document.createElement('div');div.className='item';div.dataset.itemId=Date.now();
+  let kindOptions='',extra='';
+  if(key==='rehab'||key==='purchase'){
+    kindOptions='<option selected value="fixed">$ Fixed</option><option value="pct_price">% of ARV</option>';
+  }else if(key==='holding'){
+    extra='<select class="item-type"><option selected value="fixed">$ Fixed</option></select><select class="item-freq"><option selected value="per_month">Per Month</option><option value="per_year">Per Year</option></select>';
+  }else if(key==='sales'){
+    kindOptions='<option selected value="pct_arv">% of ARV</option><option value="fixed">$ Fixed</option>';
+  }
+  if(key==='holding'){
+    div.innerHTML=`<div class="item-label-wrap">Item name</div><input class="item-label" placeholder="Item name" type="text"/><div class="item-label-wrap">Amount ($)</div><input class="item-value small-input" value="0" inputmode="decimal"/>${extra}<button type="button" class="icon-btn" aria-label="Delete">🗑️</button>`;
+  }else{
+    div.innerHTML=`<div class="item-label-wrap">Item name</div><input class="item-label" placeholder="Item name" type="text"/><div class="item-label-wrap">Amount</div><input class="item-value small-input" value="0" inputmode="decimal"/><select class="item-kind">${kindOptions}</select><button type="button" class="icon-btn" aria-label="Delete">🗑️</button>`;
+  }
+  div.querySelector('.icon-btn').onclick=()=>{div.remove();recalcEditor(key);updateVisibleTotals();updateStep7Preview();};
+  div.querySelector('.item-value').oninput=()=>{recalcEditor(key);updateStep7Preview();};
+  const ks=div.querySelector('.item-kind');if(ks)ks.onchange=()=>{recalcEditor(key);updateStep7Preview();};
+  const fs=div.querySelector('.item-freq');if(fs)fs.onchange=()=>{recalcEditor(key);updateStep7Preview();};
+  area.appendChild(div);
+  recalcEditor(key);
+}
+
+/* ==================== RECALC EDITORS ==================== */
+function recalcEditor(key){
+  if(key==='rehab')return recalcRehabEditor();
+  if(key==='purchase')return recalcPurchaseEditor();
+  if(key==='holding')return recalcHoldingEditor();
+  if(key==='sales')return recalcSalesEditor();
+}
+
+function recalcRehabEditor(){
+  const ed=$('editor-rehab');if(!ed)return 0;
+  const arv=uc($('arv').value);
+  let total=0;
+  Array.from(ed.querySelectorAll('.item')).forEach(item=>{
+    const kind=(item.querySelector('.item-kind')||{}).value||'fixed';
+    const val=uc((item.querySelector('.item-value')||{}).value);
+    total+=kind==='pct_price'?arv*(val/100):val;
+  });
+  if($('rehabEditorTotal'))$('rehabEditorTotal').textContent=fc(total);
+  editorState.rehabExtras=total;
+  return total;
+}
+
+function recalcPurchaseEditor(){
+  const ed=$('editor-purchase');if(!ed)return 0;
+  const arv=uc($('arv').value);
+  let total=0;
+  Array.from(ed.querySelectorAll('.item')).forEach(item=>{
+    const kind=(item.querySelector('.item-kind')||{}).value||'fixed';
+    const val=uc((item.querySelector('.item-value')||{}).value);
+    total+=kind==='pct_price'?arv*(val/100):val;
+  });
+  if($('purchaseEditorTotal'))$('purchaseEditorTotal').textContent=fc(total);
+  editorState.purchaseExtrasUpfront=total;
+  return total;
+}
+
+function recalcHoldingEditor(){
+  const ed=$('editor-holding');if(!ed)return 0;
+  let extras=0;
+  Array.from(ed.querySelectorAll('.item')).forEach(item=>{
+    const val=uc((item.querySelector('.item-value')||{}).value);
+    const freq=(item.querySelector('.item-freq')||{}).value||'per_month';
+    extras+=freq==='per_year'?val/12:val;
+  });
+  if($('holdingEditorTotal'))$('holdingEditorTotal').textContent=fc(extras);
+  editorState.holdingMonthlyExtras=extras;
+  return extras;
+}
+
+function recalcSalesEditor(){
+  const ed=$('editor-sales');if(!ed)return 0;
+  const arv=uc($('arv').value)||0;
+  let total=0;
+  Array.from(ed.querySelectorAll('.item')).forEach(item=>{
+    const kind=(item.querySelector('.item-kind')||{}).value||'fixed';
+    const val=uc((item.querySelector('.item-value')||{}).value);
+    total+=kind==='pct_arv'?arv*(val/100):val;
+  });
+  if($('salesEditorTotal'))$('salesEditorTotal').textContent=fc(total);
+  editorState.salesExtras=total;
+  return total;
+}
+
+function recalcAllEditors(){recalcRehabEditor();recalcPurchaseEditor();recalcHoldingEditor();recalcSalesEditor();}
+
+/* ==================== SAVE EDITORS ==================== */
+function saveEditor(key){
+  if(key==='rehab'){
+    const total=recalcRehabEditor();
+    editorState.rehabExtras=total;
+    const raw=uc($('repairs').value);if(raw)editorState.rehabManualBase=raw;
+    const applied=editorState.rehabManualOnly?editorState.rehabManualBase:total;
+    $('repairs').value=applied?fc(applied):'';
+    $('rehabBreakdown').textContent=`Itemized total: ${fc(total)}`;
+  }else if(key==='purchase'){
+    const total=recalcPurchaseEditor();
+    const raw=uc($('purchaseClosing').value);if(raw)editorState.purchaseManualBase=raw;
+    const applied=editorState.purchaseManualOnly?editorState.purchaseManualBase:total;
+    $('purchaseClosing').value=applied?fc(applied):'';
+    $('purchaseBreakdown').textContent=`Itemized total: ${fc(total)}`;
+  }else if(key==='holding'){
+    const extras=recalcHoldingEditor();
+    editorState.holdingMonthlyExtras=extras;
+    const raw=uc($('holdingMonthly').value);if(raw)editorState.holdingMonthlyBase=raw;
+    const applied=editorState.holdingManualOnly?editorState.holdingMonthlyBase:extras;
+    $('holdingMonthly').value=applied?fc(applied):'';
+  }else if(key==='sales'){
+    const total=recalcSalesEditor();
+    editorState.salesExtras=total;
+    $('salesBreakdown').textContent=`Itemized total: ${fc(total)}`;
+  }
+  cancelEditor(key);
+  recalcAllEditors();
+  updateVisibleTotals();
+  updateStep7Preview();
+}
+
+/* ==================== WIRE EXISTING EDITOR ITEMS ==================== */
+function attachEditorInit(editorId){
+  const ed=$(editorId);if(!ed)return;
+  const key=editorId.replace('editor-','');
+  Array.from(ed.querySelectorAll('.item')).forEach(item=>{
+    const valEl=item.querySelector('.item-value');
+    if(valEl){
+      valEl.addEventListener('focus',()=>{valEl.value=valEl.value?String(uc(valEl.value)):''});
+      valEl.addEventListener('input',()=>{recalcEditor(key);updateStep7Preview();});
+      valEl.addEventListener('blur',()=>{
+        const kind=(item.querySelector('.item-kind')||{}).value||'fixed';
+        const v=uc(valEl.value);
+        valEl.value=(kind==='fixed')?( v?fc(v):'' ):(v||'');
+        recalcEditor(key);
+      });
+    }
+    const kindEl=item.querySelector('.item-kind');
+    if(kindEl)kindEl.addEventListener('change',()=>{recalcEditor(key);updateStep7Preview();});
+    const freqEl=item.querySelector('.item-freq');
+    if(freqEl)freqEl.addEventListener('change',()=>{recalcEditor(key);updateStep7Preview();});
+    const delEl=item.querySelector('.icon-btn');
+    if(delEl)delEl.addEventListener('click',()=>{item.remove();recalcEditor(key);updateVisibleTotals();updateStep7Preview();});
+  });
+}
+
+/* ==================== UPDATE VISIBLE TOTALS ==================== */
+function updateVisibleTotals(){
+  if($('repairs')&&document.activeElement!==$('repairs')){
+    const v=editorState.rehabManualOnly?editorState.rehabManualBase:editorState.rehabExtras;
+    $('repairs').value=v?fc(v):'';
+  }
+  if($('purchaseClosing')&&document.activeElement!==$('purchaseClosing')){
+    const v=editorState.purchaseManualOnly?editorState.purchaseManualBase:editorState.purchaseExtrasUpfront;
+    $('purchaseClosing').value=v?fc(v):'';
+  }
+  const days=Number(($('holdingDays')||{}).value)||90;
+  const months=days/30;
+  const monthly=editorState.holdingManualOnly?editorState.holdingMonthlyBase:editorState.holdingMonthlyExtras;
+  if($('holdingMonthly')&&document.activeElement!==$('holdingMonthly')){
+    $('holdingMonthly').value=monthly?fc(monthly):'';
+  }
+  if($('holdDaysDisplay'))$('holdDaysDisplay').textContent=days;
+  if($('holdMonthsDisplay'))$('holdMonthsDisplay').textContent=months.toFixed(1);
+  if($('holdingTotalDisplay'))$('holdingTotalDisplay').textContent=fc(monthly*months);
+}
+
+/* ==================== STEP 7 PREVIEW ==================== */
+function updateStep7Preview(){
+  recalcAllEditors();
+  const arv=uc($('arv').value)||0;
+  const fee=uc($('wholesaleFee').value)||0;
+  const repairs=editorState.rehabManualOnly?editorState.rehabManualBase:editorState.rehabExtras;
+  const closing=editorState.purchaseManualOnly?editorState.purchaseManualBase:editorState.purchaseExtrasUpfront;
+  const days=Number(($('holdingDays')||{}).value)||90;
+  const months=days/30;
+  const monthly=editorState.holdingManualOnly?editorState.holdingMonthlyBase:editorState.holdingMonthlyExtras;
+  const holding=monthly*months;
+  const sales=editorState.salesExtras||0;
+  const mao=calcMAO(arv,fee,repairs,closing,holding,sales);
+  const isGood=mao>0;
+
+  if($('arvPreview'))$('arvPreview').value=fc(arv);
+  if($('feePreview'))$('feePreview').value=fc(fee);
+  if($('repairsPreview'))$('repairsPreview').value=fc(repairs);
+  if($('closingPreview'))$('closingPreview').value=fc(closing);
+  if($('holdingPreview'))$('holdingPreview').value=fc(holding);
+  if($('salesPreview'))$('salesPreview').value=fc(sales);
+  const bp=buyerType==='flipper'?getBuyerProfit(arv):0;
+  if($('barArv'))$('barArv').textContent=fc(arv);
+  if($('barCosts'))$('barCosts').textContent=fc(repairs+closing+holding+sales+bp);
+  if($('barFee'))$('barFee').textContent=fc(fee);
+  if($('barMao')){
+    $('barMao').textContent=fc(mao);
+    $('barMao').style.color=isGood?'#6fcf97':'#ff6b6b';
+  }
+}
+
+function getBuyerProfit(arv){
+  if(buyerType!=='flipper')return 0;
+  const d=uc($('flipperProfit').value);
+  const p=Number(($('flipperProfitPct')||{}).value)||0;
+  if(d>0) return d;
+  if(p>0) return arv*(p/100);
+  return 0;
+}
+
+/* ==================== 70% RULE + STEP 3 SYNC ==================== */
+function updateStep3(){
+  const arv=uc($('arv').value)||0;
+  const repairs=editorState.rehabManualOnly?editorState.rehabManualBase:editorState.rehabExtras;
+  const fee=uc($('wholesaleFee').value)||0;
+
+  // Assignment fee display mirrors wholesale fee
+  if($('assignmentFeeDisplay')) $('assignmentFeeDisplay').value=fc(fee);
+
+  // 70% rule: MAO = (ARV * 0.70) - Repairs
+  const rule70=Math.round(arv*0.70 - repairs);
+  if($('rule70Mao')) $('rule70Mao').value=arv?fc(rule70):'—';
+
+  // Your MAO from full calculation
+  const closing=editorState.purchaseManualOnly?editorState.purchaseManualBase:editorState.purchaseExtrasUpfront;
+  const days=Number(($('holdingDays')||{}).value)||90;
+  const months=days/30;
+  const monthly=editorState.holdingManualOnly?editorState.holdingMonthlyBase:editorState.holdingMonthlyExtras;
+  const holding=monthly*months;
+  const sales=editorState.salesExtras||0;
+  const yourMao=calcMAO(arv,fee,repairs,closing,holding,sales);
+  if($('rule70YourMao')) $('rule70YourMao').value=arv?fc(yourMao):'—';
+
+  // Verdict
+  const verdict=$('rule70Verdict');
+  if(verdict && arv>0){
+    if(yourMao<=rule70){
+      verdict.style.background='#f0fff4';
+      verdict.style.color='#276749';
+      verdict.textContent='✅ Your MAO is at or below the 70% Rule — your cash buyer has solid upside.';
+    } else {
+      verdict.style.background='#fff5f5';
+      verdict.style.color='#9b2c2c';
+      verdict.textContent='⚠️ Your MAO exceeds the 70% Rule. The deal may be tight for your cash buyer — consider reducing your offer or fee.';
+    }
+  } else if(verdict){
+    verdict.textContent='Enter ARV and Repair costs in Steps 2–4 to see the 70% Rule check.';
+    verdict.style.background='#f8f9fb';
+    verdict.style.color='#666';
+  }
+
+  // Show/hide double close cost field
+  const dt=$('dealType');
+  const dcWrap=$('doublecloseExtraWrap');
+  if(dt&&dcWrap) dcWrap.style.display=dt.value==='double_close'?'':'none';
+}
+
+function calcMAO(arv,fee,repairs,closing,holding,sales){
+  if(buyerType==='flipper'){
+    return arv-getBuyerProfit(arv)-repairs-closing-holding-sales-fee;
+  }else{
+    const grossRent=uc($('grossRent').value)||0;
+    const coc=Number(($('cocReturn')||{}).value)||0;
+    const vacancy=Number(($('vacancyRate')||{}).value)||5;
+    const opEx=uc($('opEx').value)||0;
+    const annualNOI=(grossRent*(1-vacancy/100)*12)-(opEx*12);
+    const maxAllIn=coc>0?(annualNOI/coc)*100:0;
+    editorState.rentalMaxAllIn=maxAllIn;
+    editorState.rentalAnnualNOI=annualNOI;
+    return maxAllIn-repairs-closing-holding-sales-fee;
+  }
+}
+
+/* ==================== COMPUTE & RENDER ==================== */
+function computeAndRender(){
+  const rc = $('reportContainer');
+  if(!rc) return;
+
+  try {
+    recalcAllEditors();
+
+    const arv  = uc(($('arv')||{}).value) || 0;
+    const fee  = uc(($('wholesaleFee')||{}).value) || 0;
+    let buyerProfit = 0;
+    if(buyerType==='flipper') buyerProfit = getBuyerProfit(arv);
+
+    // Only hard requirement: ARV > 0
+    if(arv <= 0){
+      rc.innerHTML = '<div style="background:#ffeaea;color:#b71c1c;padding:14px;border-radius:8px;font-weight:600;font-size:14px;line-height:1.6">⚠️ Please go back to <strong>Step 2</strong> and enter an After Repair Value (ARV) before generating the report.</div>';
+      return;
+    }
+
+    const repairs = editorState.rehabManualOnly    ? editorState.rehabManualBase   : editorState.rehabExtras;
+    const closing = editorState.purchaseManualOnly ? editorState.purchaseManualBase : editorState.purchaseExtrasUpfront;
+    const days    = Number(($('holdingDays')||{}).value) || 90;
+    const months  = days / 30;
+    const monthly = editorState.holdingManualOnly  ? editorState.holdingMonthlyBase : editorState.holdingMonthlyExtras;
+    const holding = monthly * months;
+    const sales   = editorState.salesExtras || 0;
+
+    const emd         = uc(($('emd')||{}).value)||0;
+    const dealType    = ($('dealType')||{}).value||'assignment';
+    const dcCost      = dealType==='double_close' ? uc(($('doubleCloseCost')||{}).value)||0 : 0;
+    const beds        = ($('beds')||{}).value||'';
+    const baths       = ($('baths')||{}).value||'';
+    const yearBuilt   = ($('yearBuilt')||{}).value||'';
+
+    // Effective total sale costs includes double-close cost if applicable
+    const salesTotal  = sales + dcCost;
+    const mao         = calcMAO(arv, fee, repairs, closing, holding, salesTotal);
+    const sqft        = Number(($('squareFootage')||{}).value)||0;
+    const isGood      = mao>0;
+    const allCosts    = repairs + closing + holding + salesTotal + buyerProfit;
+
+    // Cash the wholesaler needs to bring (EMD for assignment; full close for double close)
+    const cashToClose = dealType==='assignment' ? emd : (mao + closing + emd);
+    // Net wholesaler profit after any double-close overhead
+    const netProfit   = fee - dcCost;
+    // ROI on cash deployed
+    const roi         = cashToClose > 0 ? (netProfit / cashToClose * 100) : 0;
+    // 70% rule
+    const rule70Mao   = arv*0.70 - repairs;
+
+    /* ---- property block ---- */
+    const addr = [($('street')||{}).value, ($('city')||{}).value, ($('state')||{}).value, ($('zip')||{}).value, ($('features')||{}).value].map(v=>v||'');
+    const propDetails = [beds?beds+' bed':'', baths?baths+' bath':'', sqft?sqft.toLocaleString()+' sqft':'', yearBuilt?'Built '+yearBuilt:''].filter(Boolean).join(' · ');
+    let propSection = '';
+    if(addr.some(Boolean)||propDetails){
+      propSection =
+        '<div style="margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.12)">' +
+        '<div style="font-weight:700;margin-bottom:6px;font-size:12px;opacity:0.6;text-transform:uppercase;letter-spacing:0.5px">Property</div>' +
+        (addr[0] ? '<div class="line"><div>Address</div><div>' + escapeHtml(addr[0]) + '</div></div>' : '') +
+        ([addr[1],addr[2],addr[3]].some(Boolean) ? '<div class="line"><div>Location</div><div>' + escapeHtml([addr[1],addr[2],addr[3]].filter(Boolean).join(', ')) + '</div></div>' : '') +
+        (propDetails ? '<div class="line"><div>Property</div><div>' + escapeHtml(propDetails) + '</div></div>' : '') +
+        (addr[4] ? '<div class="line"><div>Notes</div><div style="max-width:55%;text-align:right">' + escapeHtml(addr[4]) + '</div></div>' : '') +
+        '</div>';
+    }
+
+    const rentalExtra = buyerType==='rental'
+      ? '<div class="line"><div>Annual NOI</div><div>' + fc(editorState.rentalAnnualNOI||0) + '</div></div>' +
+        '<div class="line"><div>Max All-In (Buyer)</div><div>' + fc(editorState.rentalMaxAllIn||0) + '</div></div>'
+      : '';
+
+    const dealTypeLabel = dealType==='double_close' ? 'Double Close' : 'Assignment of Contract';
+    const rule70Pass = mao <= rule70Mao;
+
+    /* ---- clear & build report ---- */
+    rc.innerHTML = '';
+
+    // Summary card
+    const summary = document.createElement('div');
+    summary.className = 'results';
+    summary.innerHTML =
+      '<h3 style="margin:0 0 12px">Wholesale Analysis Summary</h3>' +
+      propSection +
+      '<div class="line"><div>After Repair Value (ARV)</div><div>' + fc(arv) + '</div></div>' +
+      '<div class="line"><div>Repairs</div><div>' + fc(repairs) + '</div></div>' +
+      '<div class="line"><div>Purchase Closing</div><div>' + fc(closing) + '</div></div>' +
+      '<div class="line"><div>Holding (' + days + ' days)</div><div>' + fc(holding) + '</div></div>' +
+      '<div class="line"><div>Sale Costs</div><div>' + fc(salesTotal) + '</div></div>' +
+      (buyerType==='flipper' ? '<div class="line"><div>Flipper\'s Profit</div><div>' + fc(buyerProfit) + '</div></div>' : '') +
+      rentalExtra +
+      '<div class="line"><div>Wholesale Fee (Assignment)</div><div>' + fc(fee) + '</div></div>' +
+      (dcCost > 0 ? '<div class="line"><div>Double Close Extra Costs</div><div>' + fc(dcCost) + '</div></div>' : '') +
+      '<div class="line" style="font-weight:800;font-size:15px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.2);border-bottom:none">' +
+        '<div style="color:var(--gold)">Max Allowable Offer (MAO)</div>' +
+        '<div style="color:' + (isGood?'#6fcf97':'#ff6b6b') + ';font-size:20px">' + fc(mao) + '</div>' +
+      '</div>' +
+      '<div style="padding-top:10px;color:' + (isGood?'#6fcf97':'#ff6b6b') + ';font-weight:700;font-size:14px">' +
+        (isGood ? '✅ This deal has room — present to your cash buyers!' : '⚠️ Numbers upside down. Negotiate price or adjust costs.') +
+      '</div>';
+    rc.appendChild(summary);
+
+    // Breakdown card
+    const bk = document.createElement('div');
+    bk.className = 'card';
+    bk.style.marginTop = '12px';
+    bk.innerHTML =
+      '<div style="font-weight:700;margin-bottom:10px;color:var(--blue)">Full Cost Breakdown</div>' +
+      `<div class="breakdown-row"><div>ARV</div><div>${fc(arv)}</div></div>` +
+      `<div class="breakdown-row"><div>Repairs</div><div>– ${fc(repairs)}</div></div>` +
+      `<div class="breakdown-row"><div>Purchase Closing</div><div>– ${fc(closing)}</div></div>` +
+      `<div class="breakdown-row"><div>Holding (${days} days / ${months.toFixed(1)} mo)</div><div>– ${fc(holding)}</div></div>` +
+      `<div class="breakdown-row"><div>Sale Costs</div><div>– ${fc(salesTotal)}</div></div>` +
+      (buyerType==='flipper' ? `<div class="breakdown-row"><div>Flipper's Profit</div><div>– ${fc(buyerProfit)}</div></div>` : '') +
+      `<div class="breakdown-row"><div>Wholesale Fee</div><div>– ${fc(fee)}</div></div>` +
+      `<div class="breakdown-row total"><div>Max Allowable Offer (MAO)</div><div style="color:${isGood?'var(--green)':'#d9534f'}">${fc(mao)}</div></div>` +
+      (sqft > 0
+        ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee">` +
+          `<div style="font-weight:700;margin-bottom:8px;font-size:13px;color:var(--blue)">Per Sq Ft (${sqft.toLocaleString()} sqft)</div>` +
+          `<div class="breakdown-row"><div>MAO / sqft</div><div>${fc(mao/sqft)}</div></div>` +
+          `<div class="breakdown-row"><div>Repair / sqft</div><div>${fc(repairs/sqft)}</div></div>` +
+          `<div class="breakdown-row"><div>ARV / sqft</div><div>${fc(arv/sqft)}</div></div></div>`
+        : '');
+    rc.appendChild(bk);
+
+    // Deal Metrics card
+    const dm = document.createElement('div');
+    dm.className = 'card';
+    dm.style.marginTop = '12px';
+    dm.innerHTML =
+      '<div style="font-weight:700;margin-bottom:10px;color:var(--blue)">📋 Deal Metrics &amp; Wholesaler Summary</div>' +
+      '<div class="breakdown-row"><div>Deal / Exit Strategy</div><div style="font-weight:600">' + dealTypeLabel + '</div></div>' +
+      '<div class="breakdown-row"><div>Earnest Money Deposit (EMD)</div><div>' + fc(emd) + '</div></div>' +
+      '<div class="breakdown-row"><div>Cash to Close (Wholesaler)</div><div style="font-weight:700;color:var(--blue)">' + fc(cashToClose) + '</div></div>' +
+      '<div class="breakdown-row"><div>Gross Wholesale Fee</div><div>' + fc(fee) + '</div></div>' +
+      (dcCost > 0 ? '<div class="breakdown-row"><div>Double Close Costs</div><div>– ' + fc(dcCost) + '</div></div>' : '') +
+      '<div class="breakdown-row"><div>Net Wholesaler Profit</div><div style="font-weight:700;color:' + (netProfit>=0?'var(--green)':'#d9534f') + '">' + fc(netProfit) + '</div></div>' +
+      '<div class="breakdown-row"><div>ROI on Cash Deployed</div><div style="font-weight:700;color:' + (roi>=0?'var(--green)':'#d9534f') + '">' + roi.toFixed(1) + '%</div></div>' +
+      '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee">' +
+        '<div style="font-weight:700;margin-bottom:8px;font-size:13px;color:var(--blue)">⚡ 70% Rule Check</div>' +
+        '<div class="breakdown-row"><div>70% Rule MAO  (ARV × 70% – Repairs)</div><div style="font-weight:700">' + fc(rule70Mao) + '</div></div>' +
+        '<div class="breakdown-row"><div>Your MAO</div><div style="font-weight:700">' + fc(mao) + '</div></div>' +
+        '<div style="margin-top:8px;padding:10px 12px;border-radius:8px;font-weight:600;font-size:13px;background:' + (rule70Pass?'#f0fff4':'#fff5f5') + ';color:' + (rule70Pass?'#276749':'#9b2c2c') + '">' +
+          (rule70Pass
+            ? '✅ Your MAO is at or below the 70% rule — solid upside for your cash buyer.'
+            : '⚠️ Your MAO exceeds the 70% rule. Your cash buyer may have limited upside — consider reducing your offer or fee.') +
+        '</div>' +
+      '</div>';
+    rc.appendChild(dm);
+
+    // Pie charts
+    const chartsDiv = document.createElement('div');
+    chartsDiv.className = 'charts';
+    chartsDiv.innerHTML =
+      '<div class="chart-card"><h4>Cost Breakdown</h4><canvas id="chartCosts"></canvas></div>' +
+      '<div class="chart-card"><h4>Deal Structure</h4><canvas id="chartDeal"></canvas></div>';
+    rc.appendChild(chartsDiv);
+
+    // Line graph — cumulative cost build-up over the hold period + profit scenario
+    const lineCard = document.createElement('div');
+    lineCard.className = 'chart-card';
+    lineCard.style.marginTop = '12px';
+
+    // Build month-by-month data points
+    const totalMonths = Math.max(1, Math.ceil(months));
+    const monthLabels = [];
+    const cumulativeCostData = [];
+    const maoLineData     = [];
+    const arvLineData     = [];
+
+    // Upfront costs paid at month 0 (purchase closing + MAO)
+    const upfrontBase = closing + Math.max(0, mao);
+
+    for(let mo = 0; mo <= totalMonths; mo++){
+      monthLabels.push(mo === 0 ? 'Start' : 'Mo ' + mo);
+      // Cumulative invested: upfront costs + repairs spread evenly + monthly holding
+      const rehabProgress = mo === 0 ? 0 : Math.min(mo / totalMonths, 1);
+      const cumCost = upfrontBase + (repairs * rehabProgress) + (monthly * mo) + (mo === totalMonths ? sales + buyerProfit + fee : 0);
+      cumulativeCostData.push(Math.round(cumCost));
+      // MAO flat line (what you offered)
+      maoLineData.push(Math.max(0, mao));
+      // ARV flat line (the target exit value)
+      arvLineData.push(arv);
+    }
+
+    lineCard.innerHTML =
+      '<h4 style="margin:0 0 8px;font-size:14px;color:var(--blue);font-weight:700">Cumulative Investment vs ARV Over Hold Period</h4>' +
+      '<canvas id="chartLine"></canvas>' +
+      '<div style="margin-top:8px;font-size:12px;color:var(--muted);line-height:1.6">' +
+        'Shows how your total capital invested grows month-by-month during rehab and holding, ' +
+        'compared to your MAO (purchase offer) and the target ARV exit price.' +
+      '</div>';
+    rc.appendChild(lineCard);
+
+    // PDF button
+    const pdfBtn = document.createElement('button');
+    pdfBtn.className = 'btn btn-secondary btn-full';
+    pdfBtn.style.marginTop = '14px';
+    pdfBtn.style.fontSize = '15px';
+    pdfBtn.textContent = '⬇ Download Report (PDF)';
+    pdfBtn.addEventListener('click', downloadPdfHandler);
+    rc.appendChild(pdfBtn);
+
+    // Scroll report into view
+    setTimeout(()=>{ try{ rc.scrollIntoView({behavior:'smooth', block:'start'}); }catch(e){} }, 100);
+
+    // All charts deferred so canvases are in DOM
+    setTimeout(()=>{
+      if(chart1) try{ chart1.destroy(); }catch(e){}
+      if(chart2) try{ chart2.destroy(); }catch(e){}
+      if(chart3) try{ chart3.destroy(); }catch(e){}
+      chart1 = null; chart2 = null; chart3 = null;
+
+      const pieOpts = {
+        plugins:{
+          datalabels:{
+            formatter:(v,ctx)=>{
+              const t = ctx.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
+              return t ? (v/t*100).toFixed(1)+'%\n'+fc(v) : '';
+            },
+            color:'#fff', font:{weight:'700',size:10}, anchor:'center', clamp:true
+          },
+          legend:{position:'bottom', labels:{font:{size:11}, boxWidth:12, padding:8}}
+        },
+        responsive:true, maintainAspectRatio:true
+      };
+
+      try{
+        const c1 = $('chartCosts');
+        if(c1){
+          chart1 = new Chart(c1.getContext('2d'),{
+            type:'pie',
+            data:{
+              labels:['Repairs','Purchase Closing','Holding','Sale Costs', buyerType==='flipper' ? "Flipper's Profit" : 'Buyer Margin','Wholesale Fee'],
+              datasets:[{data:[repairs,closing,holding,sales,buyerProfit,fee], backgroundColor:['#2E8B57','#1a2a4f','#D4AF37','#c0392b','#8e44ad','#2980b9']}]
+            },
+            options:pieOpts, plugins:[ChartDataLabels]
+          });
+        }
+        const c2 = $('chartDeal');
+        if(c2){
+          chart2 = new Chart(c2.getContext('2d'),{
+            type:'pie',
+            data:{
+              labels:['MAO (to Seller)','All Costs','Wholesale Fee'],
+              datasets:[{data:[Math.max(0,mao), allCosts, fee], backgroundColor:['#2E8B57','#1a2a4f','#D4AF37']}]
+            },
+            options:pieOpts, plugins:[ChartDataLabels]
+          });
+        }
+        const c3 = $('chartLine');
+        if(c3){
+          chart3 = new Chart(c3.getContext('2d'),{
+            type:'line',
+            data:{
+              labels: monthLabels,
+              datasets:[
+                {
+                  label:'Cumulative Investment',
+                  data: cumulativeCostData,
+                  borderColor:'#c0392b',
+                  backgroundColor:'rgba(192,57,43,0.08)',
+                  fill:true,
+                  tension:0.4,
+                  pointRadius:4,
+                  pointBackgroundColor:'#c0392b',
+                  borderWidth:2
+                },
+                {
+                  label:'MAO (Purchase Offer)',
+                  data: maoLineData,
+                  borderColor:'#D4AF37',
+                  backgroundColor:'transparent',
+                  fill:false,
+                  tension:0,
+                  pointRadius:0,
+                  borderWidth:2,
+                  borderDash:[6,4]
+                },
+                {
+                  label:'ARV (Exit Target)',
+                  data: arvLineData,
+                  borderColor:'#2E8B57',
+                  backgroundColor:'transparent',
+                  fill:false,
+                  tension:0,
+                  pointRadius:0,
+                  borderWidth:2,
+                  borderDash:[6,4]
+                }
+              ]
+            },
+            options:{
+              responsive:true,
+              maintainAspectRatio:true,
+              plugins:{
+                datalabels:{ display:false },
+                legend:{ position:'bottom', labels:{ font:{size:11}, boxWidth:12, padding:10 } },
+                tooltip:{
+                  callbacks:{
+                    label:(ctx)=> ctx.dataset.label + ': ' + fc(ctx.parsed.y)
+                  }
+                }
+              },
+              scales:{
+                x:{ grid:{ color:'rgba(0,0,0,0.05)' }, ticks:{ font:{size:11} } },
+                y:{
+                  beginAtZero:false,
+                  grid:{ color:'rgba(0,0,0,0.05)' },
+                  ticks:{
+                    font:{size:11},
+                    callback:(v)=> '$' + (v >= 1000000 ? (v/1000000).toFixed(1)+'M' : v >= 1000 ? (v/1000).toFixed(0)+'K' : v)
+                  }
+                }
+              }
+            },
+            plugins:[ChartDataLabels]
+          });
+        }
+      }catch(e){ console.warn('Chart error:', e); }
+    }, 50);
+
+  } catch(err) {
+    console.error('computeAndRender error:', err);
+    rc.innerHTML =
+      '<div style="background:#ffeaea;color:#b71c1c;padding:14px;border-radius:8px;font-weight:600;font-size:14px;line-height:1.8">' +
+      '⚠️ Something went wrong generating the report.<br>' +
+      '<span style="font-weight:400;font-size:13px">' + (err && err.message ? err.message : String(err)) + '</span>' +
+      '</div>';
+  }
+}
+
+/* ==================== PDF ==================== */
+async function downloadPdfHandler(){
+  const el=$('reportContainer');
+  const pdf=new jspdf.jsPDF({unit:'mm',format:'a4'});
+  const pageWidth=210,pageHeight=297,margin=10;
+  const canvas=await html2canvas(el,{scale:2,backgroundColor:'#fff'});
+  const img=canvas.toDataURL('image/jpeg');
+  const cw=canvas.width,ch=canvas.height;
+  const maxW=pageWidth-margin*2,maxH=pageHeight-margin*2;
+  let rw=maxW,rh=(ch*maxW)/cw;
+  if(rh>maxH){rh=maxH;rw=(cw*maxH)/ch;}
+  const x=(pageWidth-rw)/2,y=(pageHeight-rh)/2;
+  pdf.addImage(img,'JPEG',x,y,rw,rh);
+  pdf.save('UTAHREIA_Wholesale_Report.pdf');
+}
+
+/* ==================== INIT ==================== */
+window.addEventListener('load',()=>{
+
+  // Nav buttons
+  $('prevBtn').addEventListener('click',()=>showStep(currentStep-1));
+  $('nextBtn').addEventListener('click',()=>{
+    if(currentStep===TOTAL_STEPS){computeAndRender();}
+    else{showStep(currentStep+1);}
+  });
+
+  // Finish Analysis button inside step 8 card
+  const finishBtn=$('finishAnalysisBtn');
+  if(finishBtn)finishBtn.addEventListener('click',computeAndRender);
+
+  ['repairs','purchaseClosing','holdingMonthly'].forEach(id=>{const el=$(id);if(el)el.value='';});
+
+  // Toggles
+  [['rehabManualToggle','rehabManualOnly'],['purchaseManualToggle','purchaseManualOnly'],['holdingManualToggle','holdingManualOnly']].forEach(([tid,sk])=>{
+    const t=$(tid);if(!t)return;
+    t.checked=false;
+    t.addEventListener('change',()=>{editorState[sk]=!!t.checked;updateVisibleTotals();updateStep7Preview();updateStep3();});
+  });
+
+  // Wire editors
+  attachEditorInit('editor-rehab');
+  attachEditorInit('editor-purchase');
+  attachEditorInit('editor-holding');
+  attachEditorInit('editor-sales');
+
+  // Currency inputs
+  ['arv','wholesaleFee','flipperProfit','grossRent','opEx','repairs','holdingMonthly','purchaseClosing','emd','doubleCloseCost'].forEach(id=>{
+    const el=$(id);if(!el)return;
+    el.addEventListener('focus',()=>{el.value=el.value?String(uc(el.value)):'';});
+    el.addEventListener('blur',()=>{
+      const raw=uc(el.value);
+      if(id==='holdingMonthly'&&raw)editorState.holdingMonthlyBase=raw;
+      if(id==='purchaseClosing'&&raw&&editorState.purchaseManualOnly)editorState.purchaseManualBase=raw;
+      if(id==='repairs'&&raw&&editorState.rehabManualOnly)editorState.rehabManualBase=raw;
+      el.value=raw?fc(raw):'';
+      recalcAllEditors();updateVisibleTotals();updateStep7Preview();updateStep3();
+    });
+  });
+
+  // Deal type toggle (show/hide double close cost)
+  if($('dealType'))$('dealType').addEventListener('change',()=>updateStep3());
+
+  // Wholesale fee mirrors to assignment fee display
+  if($('wholesaleFee'))$('wholesaleFee').addEventListener('input',()=>updateStep3());
+
+  // Flipper pct sync
+  if($('flipperProfitPct')){
+    $('flipperProfitPct').addEventListener('input',()=>{
+      const arv=uc($('arv').value),pct=Number($('flipperProfitPct').value)||0;
+      if(arv&&pct&&$('flipperProfit'))$('flipperProfit').value=fc(arv*(pct/100));
+      updateStep7Preview();updateStep3();
+    });
+  }
+
+  // Holding days
+  if($('holdingDays'))$('holdingDays').addEventListener('input',()=>{updateVisibleTotals();updateStep7Preview();updateStep3();});
+
+  // Live recalc on ARV/rent changes
+  ['arv','grossRent','cocReturn','vacancyRate'].forEach(id=>{
+    const el=$(id);if(el)el.addEventListener('input',()=>{recalcAllEditors();updateVisibleTotals();updateStep7Preview();updateStep3();});
+  });
+
+  setBuyerType('flipper');
+  showStep(1);
+  recalcAllEditors();
+  updateVisibleTotals();
+  updateStep3();
+});
+</script>
+</body>
+</html>
