@@ -11,90 +11,383 @@
 <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBv5v5ZA_pJvv_jT_ERUuXAQbG0xBqOWRY&libraries=places"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
-:root{ --blue:#1a2a4f; --gold:#D4AF37; --green:#2E8B57; --muted:#666; --card-bg:#fff; --page-bg:#f6f7f8; --radius:14px; --maxw:1200px; }
-*{box-sizing:border-box}
-body{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:var(--page-bg);color:#111}
-.wrap{max-width:var(--maxw);margin:18px auto;padding:20px;border-radius:12px;background:#fff;box-shadow:0 20px 60px rgba(10,20,30,0.06)}
-.top{display:flex;align-items:center;gap:16px;justify-content:center;margin-bottom:6px}
-.top img{height:68px}
+/* ═══════════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════════ */
+:root{
+  --blue:#1a2a4f; --gold:#D4AF37; --green:#2E8B57;
+  --muted:#666; --border:#e7e7e7;
+  --card-bg:#fff; --page-bg:#f6f7f8;
+  --radius:12px; --maxw:1200px;
+  --input-h:48px; --btn-h:48px; --tap:44px;
+}
 
-/* Hero banner */
-.hero{background:linear-gradient(135deg,#1a2a4f 0%,#2d4a8f 100%);border-radius:12px;padding:32px 24px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")}
-.hero h2{color:#fff;font-size:28px;font-weight:800;margin:0 0 10px;position:relative;line-height:1.2}
-.hero p{color:rgba(255,255,255,0.82);font-size:15px;margin:0;position:relative;max-width:600px;margin:0 auto;line-height:1.6}
-@media(max-width:600px){.hero{padding:24px 16px}.hero h2{font-size:20px}.hero p{font-size:13px}}
+/* ═══════════════════════════════════════════════
+   RESET & BASE
+═══════════════════════════════════════════════ */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  margin:0;background:var(--page-bg);color:#111;
+  -webkit-text-size-adjust:100%;
+}
 
-h1{color:var(--blue);font-size:20px;margin:6px 0 2px;text-align:center}
-.subtitle{text-align:center;color:var(--muted);margin-bottom:12px;font-size:14px}
-.card{background:var(--card-bg);padding:16px;border-radius:12px;margin-bottom:12px;box-shadow:0 8px 30px rgba(0,0,0,0.03)}
-@media(max-width:480px){.card{padding:12px;margin-bottom:10px;border-radius:8px}}
-.row{display:flex;gap:12px;flex-wrap:wrap}
-.field{flex:1 1 220px;min-width:140px;margin-bottom:10px}
-label{display:block;font-weight:600;color:var(--blue);margin-bottom:6px;font-size:13px}
-input[type="text"],input[type="number"],select,textarea{width:100%;padding:10px;border-radius:8px;border:1px solid #e7e7e7;font-size:14px;font-family:inherit}
-@media(max-width:480px){input[type="text"],input[type="number"],select,textarea{padding:12px;font-size:16px}}
-textarea{min-height:64px;resize:vertical}
-select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;-webkit-appearance:none;appearance:none;padding-right:30px}
-.muted{color:var(--muted);font-size:13px}
-.nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
-.btn{background:var(--green);color:#fff;padding:10px 14px;border-radius:10px;border:none;font-weight:700;cursor:pointer;font-family:inherit;font-size:14px}
-.btn.secondary{background:#eaeaea;color:var(--blue)}
-.btn:active{opacity:0.85}
-.pencil{cursor:pointer;border:1px solid #eee;padding:6px 12px;border-radius:8px;background:#fff;display:inline-flex;align-items:center;gap:8px;font-family:inherit;font-size:13px;font-weight:600;color:var(--blue)}
-.editor{display:none;margin-top:10px;padding:12px;border-radius:10px;background:#fbfbfb;border:1px solid #f0f0f0}
-.editor .item{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
-.editor .item input[type=text]{flex:1;min-width:100px;padding:8px;border-radius:6px;border:1px solid #e6e6e6;font-family:inherit}
-.editor .item .small-input{width:100px;padding:8px;border-radius:6px;border:1px solid #e6e6e6;font-family:inherit}
-.editor .item select{width:auto;min-width:130px;padding:8px;border-radius:6px;border:1px solid #e6e6e6;font-family:inherit;font-size:13px}
-.editor .row-actions{margin-top:10px;display:flex;gap:8px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
-.total-display{font-weight:700;font-size:15px}
-.icon-btn{background:none;border:0;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:16px}
-@media(max-width:600px){.editor .item{flex-direction:column;align-items:stretch}.editor .item input[type=text]{width:100%}.editor .item .small-input{width:100%}.editor .item select{width:100%}.editor .row-actions{flex-direction:column}.pencil{width:100%;justify-content:center}.btn{width:100%;font-size:15px;padding:12px}}
-.step{display:none;opacity:0;transition:opacity 240ms ease}
-.step.active{display:block;opacity:1}
+/* ═══════════════════════════════════════════════
+   LAYOUT WRAP
+═══════════════════════════════════════════════ */
+.wrap{
+  max-width:var(--maxw);
+  margin:0 auto;
+  padding:12px;
+  background:var(--card-bg);
+  min-height:100vh;
+}
+@media(min-width:600px){
+  .wrap{margin:16px auto;border-radius:var(--radius);box-shadow:0 20px 60px rgba(10,20,30,0.06);padding:20px;min-height:auto}
+}
+
+/* ═══════════════════════════════════════════════
+   HEADER / LOGO
+═══════════════════════════════════════════════ */
+.top{display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.top img{height:52px}
+@media(min-width:600px){.top img{height:68px}}
+
+/* ═══════════════════════════════════════════════
+   HERO BANNER
+═══════════════════════════════════════════════ */
+.hero{
+  background:linear-gradient(135deg,#1a2a4f 0%,#2d4a8f 100%);
+  border-radius:10px;padding:20px 16px;margin-bottom:12px;
+  text-align:center;position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.hero h2{color:#fff;font-size:18px;font-weight:800;margin:0 0 8px;position:relative;line-height:1.3}
+.hero p{color:rgba(255,255,255,0.82);font-size:13px;margin:0 auto;position:relative;line-height:1.6;max-width:560px}
+@media(min-width:600px){.hero{padding:32px 24px;border-radius:var(--radius)}.hero h2{font-size:26px}.hero p{font-size:15px}}
+
+/* ═══════════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════════ */
+.card{
+  background:var(--card-bg);padding:14px;
+  border-radius:10px;margin-bottom:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.04);
+}
+@media(min-width:600px){.card{padding:16px;border-radius:var(--radius);margin-bottom:12px;box-shadow:0 8px 30px rgba(0,0,0,0.03)}}
+
+/* ═══════════════════════════════════════════════
+   STEP INDICATOR
+═══════════════════════════════════════════════ */
 .step-ind{color:var(--green);font-weight:800;text-align:center;margin-bottom:8px;font-size:14px}
 .progress-wrap{margin-top:8px;background:#eee;border-radius:999px;height:6px;overflow:hidden}
 .progress-bar{background:var(--green);height:100%;border-radius:999px;transition:width 0.3s ease}
-.subheading{font-weight:700;margin:8px 0 6px;color:var(--blue);font-size:13px}
-.switch{position:relative;display:inline-block;width:52px;height:28px}
+
+/* ═══════════════════════════════════════════════
+   FORM GRID — mobile-first, single col → 2-col tablet+
+═══════════════════════════════════════════════ */
+.row{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:540px){.row{grid-template-columns:1fr 1fr}}
+/* 4-col address row on desktop */
+.row-4{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:540px){.row-4{grid-template-columns:1fr 1fr}}
+@media(min-width:900px){.row-4{grid-template-columns:1fr 1fr 1fr 1fr}}
+.field{display:flex;flex-direction:column;gap:4px}
+
+/* ═══════════════════════════════════════════════
+   LABELS & INPUTS  (16px prevents iOS zoom)
+═══════════════════════════════════════════════ */
+label{display:block;font-weight:600;color:var(--blue);margin-bottom:4px;font-size:13px;line-height:1.4}
+input[type="text"],input[type="number"],select,textarea{
+  width:100%;
+  min-height:var(--input-h);
+  padding:0 12px;
+  border-radius:8px;border:1.5px solid var(--border);
+  font-size:16px;font-family:inherit;color:#111;
+  background:#fff;
+  -webkit-appearance:none;appearance:none;
+  transition:border-color 0.15s;
+}
+input[type="text"]:focus,input[type="number"]:focus,select:focus,textarea:focus{
+  outline:none;border-color:var(--blue);
+}
+textarea{height:auto;min-height:76px;padding:10px 12px;resize:vertical}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23666' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;
+  padding-right:36px;cursor:pointer;
+}
+
+/* ═══════════════════════════════════════════════
+   BUTTONS — minimum 44px tap target
+═══════════════════════════════════════════════ */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:var(--btn-h);padding:0 16px;
+  border-radius:10px;border:none;
+  font-weight:700;cursor:pointer;font-family:inherit;font-size:15px;
+  color:#fff;background:var(--green);
+  transition:opacity 0.15s,transform 0.1s;
+  -webkit-tap-highlight-color:transparent;
+  white-space:nowrap;
+}
+.btn:active{opacity:0.85;transform:scale(0.98)}
+.btn.secondary{background:#eaeaea;color:var(--blue)}
+
+/* ═══════════════════════════════════════════════
+   NAV BUTTONS — sticky on mobile
+═══════════════════════════════════════════════ */
+.nav{
+  position:sticky;bottom:0;left:0;right:0;z-index:100;
+  background:#fff;border-top:1px solid var(--border);
+  padding:10px 12px;
+  padding-bottom:calc(10px + env(safe-area-inset-bottom));
+  display:flex;gap:10px;
+  margin:0 -12px;
+}
+.nav .btn{flex:1;font-size:15px}
+#prevBtn{max-width:90px;flex:0 0 auto}
+@media(min-width:600px){
+  .nav{position:static;border-top:none;padding:0;margin:0;margin-top:14px;background:transparent}
+  #prevBtn{max-width:120px}
+}
+/* Bottom padding so sticky nav doesn't hide content */
+#stepsArea{padding-bottom:2px}
+@media(max-width:599px){#stepsArea{padding-bottom:68px}}
+
+/* ═══════════════════════════════════════════════
+   PENCIL EDITOR TOGGLE BUTTON
+═══════════════════════════════════════════════ */
+.pencil{
+  cursor:pointer;border:1.5px solid var(--border);
+  padding:10px 14px;border-radius:8px;background:#fff;
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:inherit;font-size:14px;font-weight:600;color:var(--blue);
+  width:100%;justify-content:center;
+  min-height:var(--tap);
+  -webkit-tap-highlight-color:transparent;
+}
+@media(min-width:600px){.pencil{width:auto;justify-content:flex-start}}
+
+/* ═══════════════════════════════════════════════
+   ITEMIZED EDITOR
+═══════════════════════════════════════════════ */
+.editor{
+  display:none;margin-top:10px;padding:12px;
+  border-radius:10px;background:#fbfbfb;border:1px solid #ebebeb;
+}
+/* Mobile: each item stacks vertically */
+.editor .item{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:6px;
+  margin-bottom:12px;
+  padding-bottom:12px;
+  border-bottom:1px solid #f0f0f0;
+}
+.editor .item:last-of-type{border-bottom:none;margin-bottom:0;padding-bottom:0}
+/* Tablet+: inline row */
+@media(min-width:560px){
+  .editor .item{
+    display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+    border-bottom:none;margin-bottom:8px;padding-bottom:0;
+  }
+}
+/* Field label hint on mobile only */
+.item-mobile-label{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:2px}
+@media(min-width:560px){.item-mobile-label{display:none}}
+
+.editor .item input[type=text],.editor .item input.item-label{
+  flex:1;min-width:0;
+  min-height:40px;padding:8px 10px;
+  border-radius:6px;border:1px solid #ddd;
+  font-family:inherit;font-size:14px;
+  background:#fff;width:100%;
+}
+.editor .item .small-input{
+  width:100%;min-height:40px;
+  padding:8px 10px;border-radius:6px;border:1px solid #ddd;
+  font-family:inherit;font-size:14px;background:#fff;
+}
+@media(min-width:560px){.editor .item .small-input{width:110px}}
+.editor .item select{
+  width:100%;min-height:40px;
+  padding:0 10px;border-radius:6px;border:1px solid #ddd;
+  font-family:inherit;font-size:13px;background:#fff;
+  -webkit-appearance:none;appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23666' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 8px center;
+  padding-right:26px;cursor:pointer;
+}
+@media(min-width:560px){.editor .item select{width:auto;min-width:120px}}
+.editor .row-actions{
+  margin-top:12px;padding-top:12px;border-top:1px solid #ebebeb;
+  display:flex;flex-direction:column;gap:8px;
+}
+@media(min-width:560px){
+  .editor .row-actions{flex-direction:row;justify-content:flex-end;align-items:center}
+}
+.total-display{font-weight:700;font-size:15px;text-align:center}
+@media(min-width:560px){.total-display{text-align:left}}
+.editor .row-actions .btn-group{display:flex;gap:8px;width:100%}
+@media(min-width:560px){.editor .row-actions .btn-group{width:auto}}
+.editor .row-actions .btn-group .btn{flex:1}
+@media(min-width:560px){.editor .row-actions .btn-group .btn{flex:none}}
+.icon-btn{
+  background:none;border:0;
+  min-width:var(--tap);min-height:var(--tap);
+  display:inline-flex;align-items:center;justify-content:center;
+  border-radius:8px;cursor:pointer;font-size:18px;
+  align-self:flex-end;
+}
+@media(min-width:560px){.icon-btn{align-self:center;min-width:36px;min-height:36px}}
+
+/* ═══════════════════════════════════════════════
+   STEPS
+═══════════════════════════════════════════════ */
+.step{display:none;opacity:0;transition:opacity 200ms ease}
+.step.active{display:block;opacity:1}
+
+/* ═══════════════════════════════════════════════
+   TYPOGRAPHY HELPERS
+═══════════════════════════════════════════════ */
+.muted{color:var(--muted);font-size:13px}
+.muted-small{color:var(--muted);font-size:12px;line-height:1.5}
+.subheading{font-weight:700;margin:10px 0 6px;color:var(--blue);font-size:13px}
+
+/* ═══════════════════════════════════════════════
+   TOGGLE SWITCH
+═══════════════════════════════════════════════ */
+.switch{position:relative;display:inline-block;width:52px;height:28px;flex-shrink:0}
 .switch input{display:none}
 .slider{position:absolute;cursor:pointer;inset:0;background:#ccc;transition:.2s;border-radius:999px}
-.slider:before{position:absolute;content:"";height:20px;width:20px;left:4px;top:4px;background:white;transition:.2s;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,0.15)}
+.slider:before{position:absolute;content:"";height:20px;width:20px;left:4px;top:4px;background:#fff;transition:.2s;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,0.15)}
 input:checked+.slider{background:var(--green)}
 input:checked+.slider:before{transform:translateX(24px)}
-.toggle-label{display:inline-flex;gap:8px;align-items:center;font-weight:600;color:var(--blue);font-size:13px}
-.muted-small{color:var(--muted);font-size:12px;line-height:1.4}
-.loan-list{margin-top:8px;display:flex;flex-direction:column;gap:8px}
-.loan-card{background:#f8fafb;padding:10px;border-radius:8px;display:flex;gap:8px;align-items:center;justify-content:space-between}
-.loan-info{font-size:13px;color:#333}
-.loan-actions{display:flex;gap:8px;align-items:center}
-.after-vacancy-wrapper{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
-.finish-analysis-notice{background:#fff3cd;border:1px solid #ffc107;color:#856404;padding:12px;border-radius:8px;margin:16px 0;text-align:center;font-weight:600;font-size:14px}
-.results{margin-top:12px;padding:14px;border-radius:10px;background:linear-gradient(180deg,rgba(26,42,79,0.97),rgba(26,42,79,0.92));color:#fff}
-.results .line{display:flex;justify-content:space-between;align-items:baseline;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.07);font-size:14px;gap:8px}
-.results .line div:last-child{font-weight:600;white-space:nowrap}
-.charts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
-@media(max-width:700px){.charts{grid-template-columns:1fr}}
-.chart-card{background:#fff;padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.05)}
-.chart-card h4{margin:0 0 8px;font-size:14px;color:var(--blue);font-weight:700}
-.breakdown-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;font-size:14px;gap:8px;border-bottom:1px solid #f0f0f0}
-.breakdown-row:last-child{border-bottom:none}
-.breakdown-row.total{font-weight:800;font-size:16px;padding-top:10px;border-top:2px solid var(--blue);border-bottom:none;margin-top:4px}
-.investor-toggle{display:grid;grid-template-columns:1fr 1fr;border-radius:10px;overflow:hidden;border:1.5px solid #e7e7e7;margin-top:6px}
-.investor-toggle button{padding:12px 8px;border:none;background:#f5f5f5;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;color:var(--blue);transition:background 0.15s,color 0.15s}
+.toggle-label{display:inline-flex;gap:10px;align-items:center;font-weight:600;color:var(--blue);font-size:14px;cursor:pointer}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:8px 0}
+
+/* ═══════════════════════════════════════════════
+   INVESTOR TYPE TOGGLE
+═══════════════════════════════════════════════ */
+.investor-toggle{
+  display:grid;grid-template-columns:1fr 1fr;
+  border-radius:10px;overflow:hidden;border:1.5px solid var(--border);margin-top:6px;
+}
+.investor-toggle button{
+  padding:14px 8px;border:none;background:#f5f5f5;
+  font-family:inherit;font-size:14px;font-weight:600;
+  cursor:pointer;color:var(--blue);
+  transition:background 0.15s,color 0.15s;
+  min-height:var(--tap);
+}
 .investor-toggle button.active{background:var(--blue);color:#fff}
-.mao-summary{background:var(--blue);border-radius:10px;padding:14px;margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+/* ═══════════════════════════════════════════════
+   LOAN CARDS (Financing step)
+═══════════════════════════════════════════════ */
+.loan-list{margin-top:10px;display:flex;flex-direction:column;gap:8px}
+.loan-card{
+  background:#f8fafb;padding:12px;border-radius:8px;
+  display:flex;gap:8px;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;
+}
+.loan-info{font-size:13px;color:#333;flex:1;min-width:0}
+.loan-actions{display:flex;gap:8px;flex-shrink:0}
+.after-vacancy-wrapper{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+
+/* ═══════════════════════════════════════════════
+   INFO BOX (70% rule)
+═══════════════════════════════════════════════ */
+.info-box{
+  background:#f0f8f4;border:1.5px solid #b2dfcc;
+  border-radius:10px;padding:14px;margin-top:10px;
+}
+.info-box .verdict{
+  margin-top:8px;padding:10px 12px;
+  border-radius:6px;font-weight:600;font-size:13px;line-height:1.5;
+}
+
+/* ═══════════════════════════════════════════════
+   FINISH NOTICE
+═══════════════════════════════════════════════ */
+.finish-analysis-notice{
+  background:#fff3cd;border:1px solid #ffc107;color:#856404;
+  padding:12px;border-radius:8px;margin:0 0 14px;
+  text-align:center;font-weight:600;font-size:14px;line-height:1.5;
+}
+
+/* ═══════════════════════════════════════════════
+   RESULTS / REPORT
+═══════════════════════════════════════════════ */
+.results{
+  margin-top:12px;padding:14px;border-radius:10px;
+  background:linear-gradient(160deg,rgba(26,42,79,0.97),rgba(26,42,79,0.92));
+  color:#fff;
+}
+.results h3{margin:0 0 12px;font-size:16px}
+.results .line{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.07);
+  font-size:13px;gap:8px;flex-wrap:wrap;
+}
+.results .line div:first-child{flex:1;min-width:0}
+.results .line div:last-child{font-weight:600;white-space:nowrap;text-align:right}
+@media(min-width:480px){.results .line{font-size:14px}}
+
+/* ═══════════════════════════════════════════════
+   CHARTS
+═══════════════════════════════════════════════ */
+.charts{display:grid;grid-template-columns:1fr;gap:12px;margin-top:12px}
+@media(min-width:700px){.charts{grid-template-columns:1fr 1fr}}
+.chart-card{background:#fff;padding:12px;border-radius:10px;box-shadow:0 4px 16px rgba(0,0,0,0.05)}
+.chart-card h4{margin:0 0 8px;font-size:14px;color:var(--blue);font-weight:700}
+
+/* ═══════════════════════════════════════════════
+   BREAKDOWN TABLE
+═══════════════════════════════════════════════ */
+.breakdown-row{
+  display:flex;justify-content:space-between;align-items:baseline;
+  padding:6px 0;font-size:13px;gap:8px;border-bottom:1px solid #f0f0f0;
+  flex-wrap:wrap;
+}
+.breakdown-row div:first-child{flex:1;min-width:0}
+.breakdown-row div:last-child{font-weight:600;white-space:nowrap}
+.breakdown-row:last-child{border-bottom:none}
+.breakdown-row.total{
+  font-weight:800;font-size:15px;padding-top:10px;
+  border-top:2px solid var(--blue);border-bottom:none;margin-top:4px;
+}
+@media(min-width:480px){.breakdown-row{font-size:14px}.breakdown-row.total{font-size:16px}}
+
+/* ═══════════════════════════════════════════════
+   MAO SUMMARY BAR
+═══════════════════════════════════════════════ */
+.mao-summary{
+  background:var(--blue);border-radius:10px;
+  padding:14px 12px;margin-top:12px;
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
 @media(min-width:500px){.mao-summary{grid-template-columns:repeat(4,1fr)}}
-.mao-item{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center}
+.mao-item{display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
 .mao-label{font-size:10px;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
-.mao-value{font-size:16px;font-weight:700;color:var(--gold);line-height:1.2}
+.mao-value{font-size:15px;font-weight:700;color:var(--gold);line-height:1.2}
 @media(min-width:500px){.mao-value{font-size:18px}}
-.mao-item.big .mao-value{font-size:22px}
-.info-box{background:#f0f8f4;border:1.5px solid #b2dfcc;border-radius:10px;padding:14px;margin-top:8px}
-.info-box .verdict{margin-top:8px;padding:10px 12px;border-radius:6px;font-weight:600;font-size:13px}
-@media(max-width:768px){.wrap{padding:14px;margin:12px}}
-@media(max-width:480px){.wrap{padding:12px;margin:8px}.field{flex:1 1 100%;min-width:100%}.row{flex-direction:column;gap:8px}}
+.mao-item.big .mao-value{font-size:20px}
+@media(min-width:500px){.mao-item.big .mao-value{font-size:24px}}
+
+/* ═══════════════════════════════════════════════
+   FINANCING STEP FLEX ROWS
+═══════════════════════════════════════════════ */
+.financing-fields{display:grid;grid-template-columns:1fr;gap:10px}
+@media(min-width:540px){.financing-fields{grid-template-columns:1fr 1fr}}
+@media(min-width:900px){.financing-fields{grid-template-columns:repeat(3,1fr)}}
+.loan-btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.loan-btn-row .btn{flex:1;min-width:120px}
+@media(min-width:480px){.loan-btn-row .btn{flex:none}}
 </style>
 </head>
 <body>
@@ -118,7 +411,7 @@ input:checked+.slider:before{transform:translateX(24px)}
     <!-- ══════════════ STEP 1: Property Information ══════════════ -->
     <div class="card step active" data-step="1">
       <div class="muted">Property Information</div>
-      <div class="row">
+      <div class="row-4" style="margin-bottom:10px">
         <div class="field"><label>Street Address</label><input id="street" placeholder="Start typing address..." type="text" autocomplete="street-address"/></div>
         <div class="field"><label>City</label><input id="city" placeholder="City" type="text"/></div>
         <div class="field"><label>State</label><input id="state" placeholder="UT" type="text"/></div>
@@ -213,14 +506,12 @@ input:checked+.slider:before{transform:translateX(24px)}
     <!-- ══════════════ STEP 4: Rehab Costs ══════════════ -->
     <div class="card step" data-step="4">
       <div class="muted">Rehab Costs</div>
-      <div class="row" style="margin-bottom:8px">
-        <div class="field"><label>Repair Costs (Total)</label><input id="repairs" placeholder="$25,000" type="text"/></div>
-        <div class="field" style="align-self:end">
-          <label class="toggle-label">Manual only
-            <label class="switch"><input id="rehabManualToggle" type="checkbox"/><span class="slider"></span></label>
-          </label>
-          <div class="muted-small" style="margin-top:6px">Default: OFF (use itemized below)</div>
-        </div>
+      <div class="field" style="margin-bottom:8px"><label>Repair Costs (Total)</label><input id="repairs" placeholder="$25,000" type="text"/></div>
+      <div class="toggle-row">
+        <label class="toggle-label">Manual only
+          <label class="switch"><input id="rehabManualToggle" type="checkbox"/><span class="slider"></span></label>
+        </label>
+        <span class="muted-small">OFF = use itemized breakdown below</span>
       </div>
       <button class="pencil" onclick="toggleEditor('rehab')" type="button">✏️ Edit Repair Breakdown</button>
       <div aria-hidden="true" class="editor" id="editor-rehab">
@@ -255,7 +546,7 @@ input:checked+.slider:before{transform:translateX(24px)}
         <div style="margin-top:8px"><button class="btn" onclick="addItem('rehab')" type="button">+ Add Item</button></div>
         <div class="row-actions">
           <div class="total-display">Repair Total: <span id="rehabEditorTotal">$0</span></div>
-          <div style="display:flex;gap:8px">
+          <div class="btn-group">
             <button class="btn secondary" onclick="cancelEditor('rehab')" type="button">Cancel</button>
             <button class="btn" onclick="saveEditor('rehab')" type="button">Save</button>
           </div>
@@ -279,7 +570,7 @@ input:checked+.slider:before{transform:translateX(24px)}
       </div>
 
       <div id="financingArea">
-        <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div class="financing-fields">
           <div class="field"><label>Loan Label</label><input id="newLoanLabel" placeholder="Hard Money" type="text"/></div>
           <div class="field"><label>Loan Based On</label>
             <select id="newLoanTarget">
@@ -298,11 +589,11 @@ input:checked+.slider:before{transform:translateX(24px)}
           <div class="field"><label>Loan Term (months)</label><input id="newLoanTerm" type="number" value="6"/></div>
           <div class="field"><label>Loan Type</label><select id="newLoanType"><option>Interest-Only</option><option>Amortized</option></select></div>
         </div>
-        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <div class="loan-btn-row">
           <button class="btn" id="previewLoanBtn" style="background:#001F3F;color:#fff" type="button">Preview Loan</button>
           <button class="btn" id="addLoanBtn" type="button">Add This Loan</button>
         </div>
-        <div id="loanPreview" style="margin-top:10px;padding:10px;background:#f0f8ff;border-radius:8px;display:none"><strong>Preview:</strong><div id="loanPreviewContent"></div></div>
+        <div id="loanPreview" style="margin-top:10px;padding:12px;background:#f0f8ff;border-radius:8px;display:none;font-size:14px"><strong>Preview:</strong><div id="loanPreviewContent" style="margin-top:4px"></div></div>
         <div class="loan-list" id="loanList"></div>
         <div style="margin-top:12px;font-weight:700;font-size:14px">Total Initial Financing: <span id="computedLoanAmount">$0</span></div>
       </div>
@@ -319,13 +610,12 @@ input:checked+.slider:before{transform:translateX(24px)}
     <div class="card step" data-step="6">
       <div class="muted">Monthly Holding Costs</div>
       <div class="subheading">Holding Costs (During Rehab Period)</div>
-      <div class="row">
-        <div class="field"><label>Monthly Holding (Manual Base)</label><input id="holdingMonthly" placeholder="$500" type="text"/></div>
-        <div class="field" style="align-self:end">
-          <label class="toggle-label">Manual Only
-            <label class="switch"><input id="holdingManualToggle" type="checkbox"/><span class="slider"></span></label>
-          </label>
-        </div>
+      <div class="field" style="margin-bottom:8px"><label>Monthly Holding (Manual Base)</label><input id="holdingMonthly" placeholder="$500" type="text"/></div>
+      <div class="toggle-row">
+        <label class="toggle-label">Manual Only
+          <label class="switch"><input id="holdingManualToggle" type="checkbox"/><span class="slider"></span></label>
+        </label>
+        <span class="muted-small">OFF = use itemized below</span>
       </div>
       <button class="pencil" onclick="toggleEditor('holding')" type="button">✏️ Edit Monthly Items</button>
       <div aria-hidden="true" class="editor" id="editor-holding">
@@ -337,7 +627,7 @@ input:checked+.slider:before{transform:translateX(24px)}
         <div style="margin-top:8px"><button class="btn" onclick="addItem('holding')" type="button">+ Add Item</button></div>
         <div class="row-actions">
           <div class="total-display">Monthly Extras: <span id="holdingEditorTotal">$0</span></div>
-          <div style="display:flex;gap:8px">
+          <div class="btn-group">
             <button class="btn secondary" onclick="cancelEditor('holding')" type="button">Cancel</button>
             <button class="btn" onclick="saveEditor('holding')" type="button">Save</button>
           </div>
@@ -354,14 +644,12 @@ input:checked+.slider:before{transform:translateX(24px)}
     <!-- ══════════════ STEP 7: Purchase Costs ══════════════ -->
     <div class="card step" data-step="7">
       <div class="muted">Purchase Costs</div>
-      <div class="row" style="margin-bottom:8px">
-        <div class="field"><label>Purchase Costs (manual)</label><input id="purchaseClosing" placeholder="$3,000" type="text"/></div>
-        <div class="field" style="align-self:end">
-          <label class="toggle-label">Manual only
-            <label class="switch"><input id="purchaseManualToggle" type="checkbox"/><span class="slider"></span></label>
-          </label>
-          <div class="muted-small" style="margin-top:6px">Default: OFF</div>
-        </div>
+      <div class="field" style="margin-bottom:8px"><label>Purchase Costs (manual)</label><input id="purchaseClosing" placeholder="$3,000" type="text"/></div>
+      <div class="toggle-row">
+        <label class="toggle-label">Manual only
+          <label class="switch"><input id="purchaseManualToggle" type="checkbox"/><span class="slider"></span></label>
+        </label>
+        <span class="muted-small">OFF = use itemized breakdown</span>
       </div>
       <button class="pencil" onclick="toggleEditor('purchase')" type="button">✏️ Edit Breakdown</button>
       <div aria-hidden="true" class="editor" id="editor-purchase">
@@ -377,7 +665,7 @@ input:checked+.slider:before{transform:translateX(24px)}
         <div style="margin-top:8px"><button class="btn" onclick="addItem('purchase')" type="button">+ Add Item</button></div>
         <div class="row-actions">
           <div class="total-display">Total Upfront: <span id="purchaseEditorTotal">$0</span></div>
-          <div style="display:flex;gap:8px">
+          <div class="btn-group">
             <button class="btn secondary" onclick="cancelEditor('purchase')" type="button">Cancel</button>
             <button class="btn" onclick="saveEditor('purchase')" type="button">Save</button>
           </div>
@@ -402,7 +690,7 @@ input:checked+.slider:before{transform:translateX(24px)}
         <div style="margin-top:8px"><button class="btn" onclick="addItem('sales')" type="button">+ Add Item</button></div>
         <div class="row-actions">
           <div class="total-display">Selling Costs Total: <span id="salesEditorTotal">$0</span></div>
-          <div style="display:flex;gap:8px">
+          <div class="btn-group">
             <button class="btn secondary" onclick="cancelEditor('sales')" type="button">Cancel</button>
             <button class="btn" onclick="saveEditor('sales')" type="button">Save</button>
           </div>
@@ -747,7 +1035,9 @@ function getBuyerProfit(arv){
 function calcMAO(){
   const arv=uc($('arv').value)||0;
   const fee=uc($('wholesaleFee').value)||0;
-  const repairs=editorState.rehabManualOnly?editorState.rehabManualBase:editorState.rehabExtras;
+  // Always read repairs from the field directly — covers both manual entry and itemized total
+  const repairsFieldVal=uc($('repairs').value)||0;
+  const repairs=repairsFieldVal||( editorState.rehabManualOnly ? editorState.rehabManualBase : editorState.rehabExtras );
   const closing=editorState.purchaseManualOnly?editorState.purchaseManualBase:editorState.purchaseExtrasUpfront;
   const hMonths=Number(($('holdingTime')||{}).value)||0;
   const holdMonthly=editorState.holdingManualOnly?editorState.holdingMonthlyBase:(editorState.holdingMonthlyExtras||0);
@@ -773,7 +1063,8 @@ function calcMAO(){
 function updateStep3(){
   const arv=uc($('arv').value)||0;
   const fee=uc($('wholesaleFee').value)||0;
-  const repairs=editorState.rehabManualOnly?editorState.rehabManualBase:editorState.rehabExtras;
+  const repairsFieldVal=uc($('repairs').value)||0;
+  const repairs=repairsFieldVal||(editorState.rehabManualOnly?editorState.rehabManualBase:editorState.rehabExtras);
   const mao=calcMAO();
   const rule70=arv*0.70-repairs;
   const investorPrice=Math.max(0,mao)+fee;
@@ -786,7 +1077,7 @@ function updateStep3(){
   if(verdict && arv>0){
     if(mao<=rule70){
       verdict.style.background='#f0fff4'; verdict.style.color='#276749';
-      verdict.textContent='✅ Your MAO is at or below the 70% Rule - solid upside for your cash buyer.';
+      verdict.textContent='✅ Your MAO is at or below the 70% Rule — solid upside for your cash buyer.';
     } else {
       verdict.style.background='#fff5f5'; verdict.style.color='#9b2c2c';
       verdict.textContent='⚠️ Your MAO exceeds the 70% Rule. Consider reducing your offer or fee.';
@@ -811,7 +1102,7 @@ function computeAndRender(){
       return;
     }
 
-    const repairs=editorState.rehabManualOnly?editorState.rehabManualBase:editorState.rehabExtras;
+    const repairs=uc($('repairs').value)||(editorState.rehabManualOnly?editorState.rehabManualBase:editorState.rehabExtras);
     const closing=editorState.purchaseManualOnly?editorState.purchaseManualBase:editorState.purchaseExtrasUpfront;
     const hMonths=Number(($('holdingTime')||{}).value)||0;
     const holdMonthly=editorState.holdingManualOnly?editorState.holdingMonthlyBase:(editorState.holdingMonthlyExtras||0);
@@ -912,7 +1203,7 @@ function computeAndRender(){
         '<div class="breakdown-row"><div>70% Rule MAO (ARV × 70% − Repairs)</div><div style="font-weight:700">'+fc(rule70)+'</div></div>'+
         '<div class="breakdown-row"><div>Your MAO</div><div style="font-weight:700">'+fc(mao)+'</div></div>'+
         '<div style="margin-top:8px;padding:10px 12px;border-radius:8px;font-weight:600;font-size:13px;background:'+(rule70Pass?'#f0fff4':'#fff5f5')+';color:'+(rule70Pass?'#276749':'#9b2c2c')+'">'+
-          (rule70Pass?'✅ Your MAO is at or below the 70% rule - solid upside for your cash buyer.':'⚠️ Your MAO exceeds the 70% rule. Consider reducing your offer or fee.')+
+          (rule70Pass?'✅ Your MAO is at or below the 70% rule — solid upside for your cash buyer.':'⚠️ Your MAO exceeds the 70% rule. Consider reducing your offer or fee.')+
         '</div>'+
       '</div>';
     rc.appendChild(dm);
@@ -1058,15 +1349,36 @@ window.addEventListener('load',()=>{
     wireAllHoldingItems();
   },200);
 
-  // Currency formatting on main inputs
+  // Currency formatting + live recalc on main inputs
   ['purchasePrice','wholesaleFee','flipperProfit','grossRent','opEx','repairs','holdingMonthly','purchaseClosing','arv','newLoanCustomAmount'].forEach(id=>{
     const el=$(id); if(!el) return;
+
+    // On focus: strip formatting so user can type raw numbers
     el.addEventListener('focus',()=>{ el.value=el.value?String(uc(el.value)):''; });
+
+    // On input (as user types): update state immediately without reformatting
+    el.addEventListener('input',()=>{
+      const raw=uc(el.value);
+      // Always update the relevant editorState so calcMAO/updateStep3 see the live value
+      if(id==='repairs'){
+        editorState.rehabManualBase=raw;
+        // When manual toggle is ON, also update rehabExtras so recalcAllEditors picks it up
+        if(editorState.rehabManualOnly) editorState.rehabExtras=raw;
+      }
+      if(id==='holdingMonthly') editorState.holdingMonthlyBase=raw;
+      if(id==='purchaseClosing'&&editorState.purchaseManualOnly) editorState.purchaseManualBase=raw;
+      recalcAllEditors(); updateVisibleTotals(); updateStep3();
+    });
+
+    // On blur: reformat to currency display and do a final recalc
     el.addEventListener('blur',()=>{
       const raw=uc(el.value);
+      if(id==='repairs'){
+        editorState.rehabManualBase=raw;
+        if(editorState.rehabManualOnly) editorState.rehabExtras=raw;
+      }
       if(id==='holdingMonthly'&&raw) editorState.holdingMonthlyBase=raw;
       if(id==='purchaseClosing'&&raw&&editorState.purchaseManualOnly) editorState.purchaseManualBase=raw;
-      if(id==='repairs'&&raw&&editorState.rehabManualOnly) editorState.rehabManualBase=raw;
       el.value=raw?fc(raw):'';
       recalcAllEditors(); updateVisibleTotals(); updateStep3();
     });
