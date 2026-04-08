@@ -189,7 +189,7 @@
     }
 
     /* ═══════════════════════════════════════════════
-   FORM GRID — mobile-first, single col → 2-col tablet+
+   FORM GRID - mobile-first, single col → 2-col tablet+
 ═══════════════════════════════════════════════ */
     .row {
       display: grid;
@@ -282,7 +282,7 @@
     }
 
     /* ═══════════════════════════════════════════════
-   BUTTONS — minimum 44px tap target
+   BUTTONS - minimum 44px tap target
 ═══════════════════════════════════════════════ */
     .btn {
       display: inline-flex;
@@ -314,7 +314,7 @@
     }
 
     /* ═══════════════════════════════════════════════
-   NAV BUTTONS — sticky on mobile
+   NAV BUTTONS - sticky on mobile
 ═══════════════════════════════════════════════ */
     .nav {
       position: sticky;
@@ -1009,7 +1009,25 @@
 
 <body>
 
-  <div class="wrap" id="calcWrap">
+  <!-- ══ PHONE GATE ══ -->
+  <div class="wrap" id="gateWrap" style="max-width:480px">
+    <div class="top"><img alt="UTAH REIA logo" src="https://assets.cdn.filesafe.space/DNirEjy0ejVwbHsaBYrn/media/682f680ec314718407baed82.png" /></div>
+    <h1 style="text-align:center;color:var(--blue);margin-top:12px">Wholesaler Calculator Access</h1>
+    <div class="subtitle" style="margin-bottom:16px">Enter your phone number to unlock the calculator.</div>
+    <div class="card">
+      <div class="field">
+        <label>Phone Number</label>
+        <input id="gatePhone" inputmode="tel" placeholder="(801) 555-1234" style="font-size:16px;padding:12px" type="tel" />
+      </div>
+      <div class="field">
+        <button class="btn" id="gateSubmitBtn" style="width:100%;margin-top:8px" type="button">Unlock Calculator</button>
+      </div>
+      <div class="muted-small" id="gateMessage" style="margin-top:8px;min-height:18px;color:#b00020;text-align:center"></div>
+    </div>
+    <div style="text-align:center;margin-top:12px;color:var(--muted);font-size:13px">For UTAH REIA members only. Need access? Contact us.</div>
+  </div>
+
+  <div class="wrap" id="calcWrap" style="display:none">
     <div class="top"><img alt="UTAH REIA logo"
         src="https://assets.cdn.filesafe.space/DNirEjy0ejVwbHsaBYrn/media/682f680ec314718407baed82.png" /></div>
 
@@ -1042,7 +1060,7 @@
         </div>
         <div class="row">
           <div class="field"><label>Bedrooms</label><select id="beds">
-              <option value="">—</option>
+              <option value="">-</option>
               <option>1</option>
               <option>2</option>
               <option selected>3</option>
@@ -1051,7 +1069,7 @@
               <option>6+</option>
             </select></div>
           <div class="field"><label>Bathrooms</label><select id="baths">
-              <option value="">—</option>
+              <option value="">-</option>
               <option>1</option>
               <option>1.5</option>
               <option selected>2</option>
@@ -1081,7 +1099,7 @@
         </div>
 
         <div style="margin-bottom:14px">
-          <label style="margin-bottom:8px;display:block">Investor Strategy — Who are you selling to?</label>
+          <label style="margin-bottom:8px;display:block">Investor Strategy - Who are you selling to?</label>
           <div class="investor-toggle">
             <button type="button" id="btnFlipper" class="active" onclick="setInvestorType('flipper')">🔨 House
               Flipper</button>
@@ -1099,7 +1117,7 @@
           <div class="row">
             <div class="field"><label>Flipper's Desired Profit ($)</label><input id="flipperProfit"
                 placeholder="$30,000" type="text" /></div>
-            <div class="field"><label>— or — Flipper's Profit (% of ARV)</label><input id="flipperProfitPct"
+            <div class="field"><label>- or - Flipper's Profit (% of ARV)</label><input id="flipperProfitPct"
                 type="number" min="0" step="0.1" placeholder="e.g. 15" /></div>
           </div>
         </div>
@@ -1136,6 +1154,14 @@
               <div class="muted-small" style="margin-top:3px">Monthly costs: taxes, insurance, management, maintenance.
               </div>
             </div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <div class="field">
+            <label>After Repair Value (ARV)</label>
+            <input id="arv" placeholder="$350,000" type="text" />
+            <div class="muted-small" style="margin-top:4px">📌 The estimated market value of the property <strong>after</strong> all repairs are complete. Base this on recent comparable sales (comps) in the area.</div>
           </div>
         </div>
 
@@ -1290,31 +1316,21 @@
         <div id="rehabBreakdown" style="margin-top:6px;font-size:13px;color:#666"></div>
       </div>
 
-      <!-- ══════════════ STEP 4: Investor Purchase Flips (ARV & MAO) ══════════════ -->
-      <div class="card step" data-step="4">
-        <div class="muted">Investor Purchase Flips — ARV &amp; Max Allowable Offer</div>
+      <!-- ══════════════ STEP 8: MAO Summary ══════════════ -->
+      <div class="card step" data-step="8">
+        <div class="muted">Max Allowable Offer - Deal Summary</div>
 
         <!-- Explainer banner -->
         <div
           style="background:#eef2fa;border-left:4px solid var(--blue);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:#333;line-height:1.6">
-          <strong style="color:var(--blue)">How this works:</strong> Enter the ARV (what the property will be worth
-          <em>after</em> repairs). The calculator then works backwards — subtracting all your costs and your wholesale
-          fee — to find the <strong>Maximum Allowable Offer (MAO)</strong>: the highest price you can offer the seller
-          so the deal still works for everyone.
+          <strong style="color:var(--blue)">Your MAO result:</strong> All costs have been entered. The calculator works backwards from your ARV (entered in Step 2) - subtracting every cost layer and your wholesale fee - to find the <strong>Maximum Allowable Offer (MAO)</strong>: the highest price you can offer the seller so the deal still works for everyone.
         </div>
 
         <div class="row">
           <div class="field">
-            <label>After Repair Value (ARV)</label>
-            <input id="arv" placeholder="$350,000" type="text" />
-            <div class="muted-small" style="margin-top:4px">📌 The estimated market value of the property
-              <strong>after</strong> all repairs are complete. Base this on recent comparable sales (comps) in the area.
-            </div>
-          </div>
-          <div class="field">
             <label>Investor&#x27;s Purchase Price <span
                 style="font-weight:400;color:var(--muted)">(auto-calculated)</span></label>
-            <input id="investorPurchasePrice" placeholder="—" type="text" readonly
+            <input id="investorPurchasePrice" placeholder="-" type="text" readonly
               style="background:#f0f8ff;font-weight:700;color:var(--blue);font-size:17px" />
             <div class="muted-small" style="margin-top:4px">💰 This is what your cash buyer pays <em>you</em>. Formula:
               <strong>MAO + your wholesale fee</strong>. This is what you present to buyers.</div>
@@ -1329,9 +1345,9 @@
               style="color:rgba(255,255,255,0.65);font-size:11px;text-transform:uppercase;letter-spacing:0.6px;font-weight:700;margin-bottom:4px">
               Max Allowable Offer (MAO)</div>
             <div style="color:rgba(255,255,255,0.75);font-size:12px;line-height:1.5">The most you can offer the
-              seller.<br>Formula: ARV − All Costs − Wholesale Fee</div>
+              seller.<br>Formula: ARV − Wholesale Fee − Buyer's Profit − Rehab − Financing − Holding − Purchase Costs − Selling Costs</div>
           </div>
-          <div id="maoDisplayBox" style="color:var(--gold);font-size:28px;font-weight:800;white-space:nowrap">—</div>
+          <div id="maoDisplayBox" style="color:var(--gold);font-size:28px;font-weight:800;white-space:nowrap">-</div>
         </div>
 
         <!-- 70% Rule Quick Check -->
@@ -1361,8 +1377,8 @@
         </div>
       </div>
 
-      <!-- ══════════════ STEP 5: Financing ══════════════ -->
-      <div class="card step" data-step="5">
+      <!-- ══════════════ STEP 4: Financing ══════════════ -->
+      <div class="card step" data-step="4">
         <div class="muted">Financing &amp; Hold Period</div>
 
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px">
@@ -1429,8 +1445,8 @@
         </div>
       </div>
 
-      <!-- ══════════════ STEP 6: Holding Costs ══════════════ -->
-      <div class="card step" data-step="6">
+      <!-- ══════════════ STEP 5: Holding Costs ══════════════ -->
+      <div class="card step" data-step="5">
         <div class="muted">Monthly Holding Costs</div>
         <div class="subheading">Holding Costs (During Rehab Period)</div>
         <div class="field" style="margin-bottom:8px"><label>Monthly Holding (Manual Base)</label><input
@@ -1502,8 +1518,8 @@
         </div>
       </div>
 
-      <!-- ══════════════ STEP 7: Purchase Costs ══════════════ -->
-      <div class="card step" data-step="7">
+      <!-- ══════════════ STEP 6: Purchase Costs ══════════════ -->
+      <div class="card step" data-step="6">
         <div class="muted">Purchase Costs</div>
         <div class="field" style="margin-bottom:8px"><label>Purchase Costs (manual)</label><input id="purchaseClosing"
             placeholder="$3,000" type="text" /></div>
@@ -1603,8 +1619,8 @@
         <div id="purchaseBreakdown" style="margin-top:6px;font-size:13px;color:#666"></div>
       </div>
 
-      <!-- ══════════════ STEP 8: Selling Costs ══════════════ -->
-      <div class="card step" data-step="8">
+      <!-- ══════════════ STEP 7: Selling Costs ══════════════ -->
+      <div class="card step" data-step="7">
         <div class="muted">Selling Costs</div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
           <button class="pencil" onclick="toggleEditor('sales')" type="button">✏️ Edit Selling Costs</button>
@@ -1663,7 +1679,7 @@
       <button class="btn" id="nextBtn" type="button">Next →</button>
     </div>
 
-    <div style="text-align:center;margin-top:12px;color:var(--muted);font-size:13px">© 2025 UTAH REIA — Estimates are
+    <div style="text-align:center;margin-top:12px;color:var(--muted);font-size:13px">© 2025 UTAH REIA - Estimates are
       educational only.</div>
   </div>
 
@@ -1733,7 +1749,7 @@
       $('progressBar').style.width = ((currentStep / TOTAL_STEPS) * 100) + '%';
       $('prevBtn').style.display = currentStep === 1 ? 'none' : 'inline-block';
       $('nextBtn').style.display = currentStep === TOTAL_STEPS ? 'none' : 'inline-block';
-      if (currentStep === 4) updateStep3();
+      if (currentStep === 8) updateStep3();
       try { $('calcWrap').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { }
     }
 
@@ -1790,7 +1806,7 @@
 
     function renderLoanList() {
       $('loanList').innerHTML = loans.map(l =>
-        '<div class="loan-card"><div class="loan-info"><strong>' + escapeHtml(l.label) + '</strong><div>' + fc(l.financed) + ' @ ' + l.rate + '% — ' + escapeHtml(l.type) + ' — ' + l.term + ' mo</div></div>' +
+        '<div class="loan-card"><div class="loan-info"><strong>' + escapeHtml(l.label) + '</strong><div>' + fc(l.financed) + ' @ ' + l.rate + '% - ' + escapeHtml(l.type) + ' - ' + l.term + ' mo</div></div>' +
         '<div class="loan-actions"><button type="button" class="btn secondary" onclick="removeLoan(' + l.id + ')">Delete</button></div></div>'
       ).join('');
       updateAggregatedLoanAmountDisplay();
@@ -1988,10 +2004,11 @@
     function calcMAO() {
       const arv = uc($('arv').value) || 0;
       const fee = uc($('wholesaleFee').value) || 0;
-      // Always read repairs from the field directly — covers both manual entry and itemized total
+      // Always read repairs from the field directly - covers both manual entry and itemized total
       const repairsFieldVal = uc($('repairs').value) || 0;
       const repairs = repairsFieldVal || (editorState.rehabManualOnly ? editorState.rehabManualBase : editorState.rehabExtras);
-      const closing = editorState.purchaseManualOnly ? editorState.purchaseManualBase : editorState.purchaseExtrasUpfront;
+      // Purchase Cost: include ALL costs (upfront + rolled) per boss formula
+      const closing = editorState.purchaseManualOnly ? editorState.purchaseManualBase : (editorState.purchaseExtrasUpfront + editorState.purchaseExtrasRolled);
       const hMonths = Number(($('holdingTime') || {}).value) || 0;
       const holdMonthly = editorState.holdingManualOnly ? editorState.holdingMonthlyBase : (editorState.holdingMonthlyExtras || 0);
       let interest = 0; loans.forEach(l => { interest += (l.financed * (l.rate / 100) / 12) * hMonths; });
@@ -2022,25 +2039,25 @@
       const rule70 = arv * 0.70 - repairs;
       const investorPrice = Math.max(0, mao) + fee;
 
-      if ($('investorPurchasePrice')) $('investorPurchasePrice').value = arv ? fc(investorPrice) : '—';
-      if ($('rule70Mao')) $('rule70Mao').value = arv ? fc(rule70) : '—';
-      if ($('rule70YourMao')) $('rule70YourMao').value = arv ? fc(mao) : '—';
+      if ($('investorPurchasePrice')) $('investorPurchasePrice').value = arv ? fc(investorPrice) : '-';
+      if ($('rule70Mao')) $('rule70Mao').value = arv ? fc(rule70) : '-';
+      if ($('rule70YourMao')) $('rule70YourMao').value = arv ? fc(mao) : '-';
       // Update MAO display box
       const maoBox = $('maoDisplayBox');
-      if (maoBox) maoBox.textContent = arv ? (fc(mao) + (mao < 0 ? ' ⚠️' : ' ✅')) : '—';
+      if (maoBox) maoBox.textContent = arv ? (fc(mao) + (mao < 0 ? ' ⚠️' : ' ✅')) : '-';
       if (maoBox) maoBox.style.color = mao >= 0 ? 'var(--gold)' : '#ff6b6b';
 
       const verdict = $('rule70Verdict');
       if (verdict && arv > 0) {
         if (mao <= rule70) {
           verdict.style.background = '#f0fff4'; verdict.style.color = '#276749';
-          verdict.textContent = '✅ Your MAO is at or below the 70% Rule — solid upside for your cash buyer.';
+          verdict.textContent = '✅ Your MAO is at or below the 70% Rule - solid upside for your cash buyer.';
         } else {
           verdict.style.background = '#fff5f5'; verdict.style.color = '#9b2c2c';
           verdict.textContent = '⚠️ Your MAO exceeds the 70% Rule. Consider reducing your offer or fee.';
         }
       } else if (verdict) {
-        verdict.textContent = 'Enter Repairs in Step 3 and ARV in Step 4 to see the check.';
+        verdict.textContent = 'Enter Repairs in Step 3 and ARV in Step 2 to see the check.';
         verdict.style.background = '#f8f9fb'; verdict.style.color = '#666';
       }
     }
@@ -2055,12 +2072,12 @@
         const purchasePrice = uc($('purchasePrice').value) || 0;
 
         if (arv <= 0) {
-          rc.innerHTML = '<div style="background:#ffeaea;color:#b71c1c;padding:14px;border-radius:8px;font-weight:600;font-size:14px">⚠️ Please go back to <strong>Step 4</strong> and enter an After Repair Value (ARV) before generating the report.</div>';
+          rc.innerHTML = '<div style="background:#ffeaea;color:#b71c1c;padding:14px;border-radius:8px;font-weight:600;font-size:14px">⚠️ Please go back to <strong>Step 2</strong> and enter an After Repair Value (ARV) before generating the report.</div>';
           return;
         }
 
         const repairs = uc($('repairs').value) || (editorState.rehabManualOnly ? editorState.rehabManualBase : editorState.rehabExtras);
-        const closing = editorState.purchaseManualOnly ? editorState.purchaseManualBase : editorState.purchaseExtrasUpfront;
+        const closing = editorState.purchaseManualOnly ? editorState.purchaseManualBase : (editorState.purchaseExtrasUpfront + editorState.purchaseExtrasRolled);
         const hMonths = Number(($('holdingTime') || {}).value) || 0;
         const holdMonthly = editorState.holdingManualOnly ? editorState.holdingMonthlyBase : (editorState.holdingMonthlyExtras || 0);
         let interest = 0; loans.forEach(l => { interest += (l.financed * (l.rate / 100) / 12) * hMonths; });
@@ -2106,18 +2123,18 @@
         summary.innerHTML =
           '<h3 style="margin:0 0 12px;font-size:17px">Wholesale Analysis Summary</h3>' +
           '<div style="background:rgba(255,255,255,0.08);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:12px;line-height:1.7;color:rgba(255,255,255,0.8)">' +
-          '<strong style="color:#fff">How to read this report:</strong> The calculator starts from ARV (the sale price after repairs) and subtracts every cost layer. What remains is your <strong style="color:var(--gold)">Maximum Allowable Offer (MAO)</strong> — the most you can pay the seller. Your cash buyer pays you MAO + your wholesale fee.</div>' +
+          '<strong style="color:#fff">How to read this report:</strong> The calculator starts from ARV (the sale price after repairs) and subtracts every cost layer. What remains is your <strong style="color:var(--gold)">Maximum Allowable Offer (MAO)</strong> - the most you can pay the seller. Your cash buyer pays you MAO + your wholesale fee.</div>' +
           propSection +
-          '<div class="line"><div>After Repair Value (ARV) <span style="font-size:11px;opacity:0.65">— what it sells for after repairs</span></div><div>' + fc(arv) + '</div></div>' +
-          '<div class="line"><div>Your Offer to Seller <span style="font-size:11px;opacity:0.65">— what you put under contract</span></div><div>' + fc(purchasePrice) + '</div></div>' +
-          '<div class="line"><div>Repair / Rehab Costs <span style="font-size:11px;opacity:0.65">— estimated renovation budget</span></div><div>' + fc(repairs) + '</div></div>' +
-          '<div class="line"><div>Purchase Costs <span style="font-size:11px;opacity:0.65">— title, escrow, inspection, fees at closing</span></div><div>' + fc(closing) + '</div></div>' +
+          '<div class="line"><div>After Repair Value (ARV) <span style="font-size:11px;opacity:0.65">- what it sells for after repairs</span></div><div>' + fc(arv) + '</div></div>' +
+          '<div class="line"><div>Your Offer to Seller <span style="font-size:11px;opacity:0.65">- what you put under contract</span></div><div>' + fc(purchasePrice) + '</div></div>' +
+          '<div class="line"><div>Repair / Rehab Costs <span style="font-size:11px;opacity:0.65">- estimated renovation budget</span></div><div>' + fc(repairs) + '</div></div>' +
+          '<div class="line"><div>Purchase Costs <span style="font-size:11px;opacity:0.65">- title, escrow, inspection, fees at closing</span></div><div>' + fc(closing) + '</div></div>' +
           (loanAmt > 0 ? '<div class="line"><div>Total Financing</div><div>' + fc(loanAmt) + '</div></div>' : '') +
-          '<div class="line"><div>Holding Costs (' + hMonths + ' mo) <span style="font-size:11px;opacity:0.65">— taxes, insurance, utilities + loan interest</span></div><div>' + fc(holding) + '</div></div>' +
-          '<div class="line"><div>Selling Costs <span style="font-size:11px;opacity:0.65">— agent commissions + title on the exit sale</span></div><div>' + fc(sales) + '</div></div>' +
-          (investorType === 'flipper' ? '<div class="line"><div>Flipper\'s Profit <span style="font-size:11px;opacity:0.65">— your buyer\'s required return on the deal</span></div><div>' + fc(buyerProfit) + '</div></div>' : '') +
+          '<div class="line"><div>Holding Costs (' + hMonths + ' mo) <span style="font-size:11px;opacity:0.65">- taxes, insurance, utilities + loan interest</span></div><div>' + fc(holding) + '</div></div>' +
+          '<div class="line"><div>Selling Costs <span style="font-size:11px;opacity:0.65">- agent commissions + title on the exit sale</span></div><div>' + fc(sales) + '</div></div>' +
+          (investorType === 'flipper' ? '<div class="line"><div>Flipper\'s Profit <span style="font-size:11px;opacity:0.65">- your buyer\'s required return on the deal</span></div><div>' + fc(buyerProfit) + '</div></div>' : '') +
           rentalExtra +
-          '<div class="line"><div>Your Wholesale Fee <span style="font-size:11px;opacity:0.65">— your profit as the wholesaler</span></div><div>' + fc(fee) + '</div></div>' +
+          '<div class="line"><div>Your Wholesale Fee <span style="font-size:11px;opacity:0.65">- your profit as the wholesaler</span></div><div>' + fc(fee) + '</div></div>' +
           '<div class="line" style="font-weight:800;font-size:15px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.2);border-bottom:none">' +
           '<div style="color:var(--gold)">Max Allowable Offer (MAO)</div>' +
           '<div style="color:' + (isGood ? '#6fcf97' : '#ff6b6b') + ';font-size:20px">' + fc(mao) + '</div>' +
@@ -2156,13 +2173,13 @@
           '<div class="breakdown-row"><div>Your Offer to Seller</div><div>' + fc(purchasePrice) + '</div></div>' +
           '<div class="breakdown-row"><div>Investor Buys From You <span style="font-size:12px;color:var(--muted)">(MAO + your fee)</span></div><div style="font-weight:700;color:var(--blue)">' + fc(investorPrice) + '</div></div>' +
           '<div class="breakdown-row"><div>Your Wholesale Fee <span style="font-size:12px;color:var(--muted)">(your profit)</span></div><div style="font-weight:700;color:var(--green)">' + fc(fee) + '</div></div>' +
-          '<div class="breakdown-row"><div>Total Financing (Loans) <span style="font-size:12px;color:var(--muted)">— amount financed, not your out-of-pocket</span></div><div>' + fc(loanAmt) + '</div></div>' +
+          '<div class="breakdown-row"><div>Total Financing (Loans) <span style="font-size:12px;color:var(--muted)">- amount financed, not your out-of-pocket</span></div><div>' + fc(loanAmt) + '</div></div>' +
           '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee">' +
           '<div style="font-weight:700;margin-bottom:8px;font-size:13px;color:var(--blue)">⚡ 70% Rule Check</div>' +
           '<div class="breakdown-row"><div>70% Rule MAO (ARV × 70% − Repairs)</div><div style="font-weight:700">' + fc(rule70) + '</div></div>' +
           '<div class="breakdown-row"><div>Your MAO</div><div style="font-weight:700">' + fc(mao) + '</div></div>' +
           '<div style="margin-top:8px;padding:10px 12px;border-radius:8px;font-weight:600;font-size:13px;background:' + (rule70Pass ? '#f0fff4' : '#fff5f5') + ';color:' + (rule70Pass ? '#276749' : '#9b2c2c') + '">' +
-          (rule70Pass ? '✅ Your MAO is at or below the 70% rule — solid upside for your cash buyer.' : '⚠️ Your MAO exceeds the 70% rule. Consider reducing your offer or fee.') +
+          (rule70Pass ? '✅ Your MAO is at or below the 70% rule - solid upside for your cash buyer.' : '⚠️ Your MAO exceeds the 70% rule. Consider reducing your offer or fee.') +
           '</div>' +
           '</div>';
         rc.appendChild(dm);
@@ -2347,12 +2364,18 @@
         });
       });
 
-      // Flipper pct sync
+      // Flipper pct → $ sync
       if ($('flipperProfitPct')) {
         $('flipperProfitPct').addEventListener('input', () => {
           const a = uc($('arv').value), p = Number($('flipperProfitPct').value) || 0;
           if (a && p && $('flipperProfit')) $('flipperProfit').value = fc(a * (p / 100));
           recalcAllEditors(); updateVisibleTotals(); updateStep3();
+        });
+      }
+      // Flipper $ → clear pct sync (manual $ entry resets the % field)
+      if ($('flipperProfit')) {
+        $('flipperProfit').addEventListener('input', () => {
+          if ($('flipperProfitPct')) $('flipperProfitPct').value = '';
         });
       }
 
@@ -2374,6 +2397,47 @@
       updateVisibleTotals();
       updateStep3();
     });
+
+    /* ==================== PHONE GATE ==================== */
+    function normalizePhone(raw) { return String(raw || '').replace(/[^\d]/g, '').slice(-10); }
+
+    async function verifyPhoneViaWorkflow(phone) {
+      try {
+        const res = await fetch('https://wholesale-calculator-gules.vercel.app/api/check-phone-wholesale', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: normalizePhone(phone) })
+        });
+        let d;
+        try { d = await res.json(); } catch (jsonErr) { throw new Error('Server error. Please try again.'); }
+        if (d && d.valid && d.status === 'Active') return { status: 'Active' };
+        if (d && d.valid && d.trial && d.trialDaysLeft > 0) return { status: 'Trial', daysLeft: d.trialDaysLeft };
+        throw new Error('Access denied or trial expired.');
+      } catch (e) { throw e; }
+    }
+
+    const unlockCalc = () => {
+      $('gateWrap').style.display = 'none';
+      $('calcWrap').style.display = 'block';
+      showStep(1);
+    };
+
+    if (sessionStorage.getItem('utahreia_calc_verified')) unlockCalc();
+
+    $('gateSubmitBtn').onclick = async () => {
+      const p = $('gatePhone').value;
+      if (p.length < 10) return alert('Invalid Phone');
+      $('gateSubmitBtn').innerText = 'Verifying...';
+      try {
+        const res = await verifyPhoneViaWorkflow(p);
+        if (res.status === 'Trial') {
+          alert(`You are on a 30-day free trial. Days left: ${res.daysLeft}.\nContact Utah REIA to become a member and enjoy unlimited access!`);
+        }
+        sessionStorage.setItem('utahreia_calc_verified', 'true');
+        unlockCalc();
+      } catch (e) { alert(e.message); }
+      $('gateSubmitBtn').innerText = 'Unlock Calculator';
+    };
   </script>
 </body>
 
