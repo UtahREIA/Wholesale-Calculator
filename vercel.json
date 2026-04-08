@@ -1,11 +1,19 @@
 {
-  "buildCommand": "echo 'Static site with API endpoints'",
-  "outputDirectory": ".",
   "public": true,
-  "redirects": [
+  "builds": [
     {
-      "source": "/",
-      "destination": "/utah-reia-wholesaler-calculator.html"
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/utah-reia-wholesaler-calculator.html"
     }
   ]
 }
