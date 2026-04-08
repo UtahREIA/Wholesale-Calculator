@@ -1,0 +1,11 @@
+{
+  "buildCommand": "echo 'Static site with API endpoints'",
+  "outputDirectory": ".",
+  "public": true,
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/utah-reia-wholesaler-calculator.html"
+    }
+  ]
+}
