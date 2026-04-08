@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -ExecutionPolicy Bypass -File \"c:\\\\Users\\\\david\\\\Downloads\\\\Wholesale-Calculator\\\\read_xlsx.ps1\")",
+      "Bash(node -e ':*)"
+    ]
+  }
+}
