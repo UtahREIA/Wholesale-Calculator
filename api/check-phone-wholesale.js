@@ -105,7 +105,7 @@ export default async function handler(req, res) {
       return data;
     }
 
-    const isoToday = new Date().toISOString().split("T")[0];
+    const isoToday = body.localDate || new Date().toISOString().split("T")[0];
 
     // 1) Active member check
     let data = await airtableGet(filterActive);
