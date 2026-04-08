@@ -1,2 +1,10 @@
-{}
+{
+  "buildCommand": "echo 'Deploying wholesale calculator'",
+  "outputDirectory": ".",
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  }
+}
 
