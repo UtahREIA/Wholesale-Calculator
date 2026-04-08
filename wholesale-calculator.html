@@ -2408,7 +2408,7 @@
         const res = await fetch('https://wholesale-calculator-gules.vercel.app/api/check-phone-wholesale', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: normalizePhone(phone), localDate: new Date().toLocaleDateString('en-CA') })
+          body: JSON.stringify({ phone: normalizePhone(phone), localDate: (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; })() })
         });
         let d;
         try { d = await res.json(); } catch (jsonErr) { throw new Error('Server error. Please try again.'); }
