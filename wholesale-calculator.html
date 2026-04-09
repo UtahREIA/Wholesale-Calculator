@@ -1370,10 +1370,10 @@
                 under.</div>
             </div>
             <div class="field">
-              <label>Assignment Fee <span style="font-weight:400;color:var(--muted)">(Investor Price − Your Offer to Seller)</span></label>
+              <label>Your Offer to Seller <span style="font-weight:400;color:var(--muted)">(from Step 1)</span></label>
               <input id="rule70YourMao" type="text" readonly
-                style="background:#fff;font-weight:700;color:var(--green)" />
-              <div class="muted-small" style="margin-top:3px">Your profit — what you keep when you assign the contract.</div>
+                style="background:#fff;font-weight:700;color:var(--blue)" />
+              <div class="muted-small" style="margin-top:3px">Your actual offer - should stay at or below the MAO.</div>
             </div>
           </div>
           <div id="rule70Verdict" class="verdict"
@@ -2044,29 +2044,31 @@
       const repairs = repairsFieldVal || (editorState.rehabManualOnly ? editorState.rehabManualBase : editorState.rehabExtras);
       const mao = calcMAO();
       const rule70 = arv * 0.70 - repairs;
-      const investorPrice = Math.max(0, mao) + fee;
-
       const purchasePrice = uc($('purchasePrice').value) || 0;
+      const investorPrice = Math.max(0, mao) + fee;
       const assignmentFee = investorPrice - purchasePrice;
+
       if ($('investorPurchasePrice')) $('investorPurchasePrice').value = arv ? fc(investorPrice) : '-';
       if ($('rule70Mao')) $('rule70Mao').value = arv ? fc(rule70) : '-';
-      if ($('rule70YourMao')) $('rule70YourMao').value = arv ? fc(assignmentFee) : '-';
+      if ($('rule70YourMao')) $('rule70YourMao').value = purchasePrice ? fc(purchasePrice) : '-';
+
       // Update MAO display box
       const maoBox = $('maoDisplayBox');
       if (maoBox) maoBox.textContent = arv ? (fc(mao) + (mao < 0 ? ' ⚠️' : ' ✅')) : '-';
       if (maoBox) maoBox.style.color = mao >= 0 ? 'var(--gold)' : '#ff6b6b';
 
+      // Warning only fires when the wholesaler's actual offer exceeds the MAO
       const verdict = $('rule70Verdict');
-      if (verdict && arv > 0) {
-        if (mao <= rule70) {
-          verdict.style.background = '#f0fff4'; verdict.style.color = '#276749';
-          verdict.textContent = '✅ Your MAO is at or below the 70% Rule - solid upside for your cash buyer.';
-        } else {
+      if (verdict && arv > 0 && purchasePrice > 0) {
+        if (purchasePrice > mao) {
           verdict.style.background = '#fff5f5'; verdict.style.color = '#9b2c2c';
-          verdict.textContent = '⚠️ Your MAO exceeds the 70% Rule. Consider reducing your offer or fee.';
+          verdict.textContent = '⚠️ Your offer exceeds the MAO. You are offering the seller more than the deal supports. Lower your offer or adjust your costs.';
+        } else {
+          verdict.style.background = '#f0fff4'; verdict.style.color = '#276749';
+          verdict.textContent = '✅ Your offer is within the MAO - the deal works for everyone.';
         }
       } else if (verdict) {
-        verdict.textContent = 'Enter Repairs in Step 3 and ARV in Step 2 to see the check.';
+        verdict.textContent = purchasePrice === 0 ? 'Enter your offer in Step 1 to see the check.' : 'Enter ARV in Step 2 to see the check.';
         verdict.style.background = '#f8f9fb'; verdict.style.color = '#666';
       }
     }
@@ -2100,7 +2102,8 @@
         const allCosts = repairs + closing + holding + sales + buyerProfit;
         const investorPrice = Math.max(0, mao) + fee;
         const rule70 = arv * 0.70 - repairs;
-        const rule70Pass = mao <= rule70;
+        // Warning fires when actual offer exceeds MAO, not based on 70% rule
+        const rule70Pass = purchasePrice > 0 ? purchasePrice <= mao : mao <= rule70;
         const sqft = Number(($('squareFootage') || {}).value) || 0;
 
         // Property info
@@ -2189,8 +2192,9 @@
           '<div style="font-weight:700;margin-bottom:8px;font-size:13px;color:var(--blue)">⚡ 70% Rule Check</div>' +
           '<div class="breakdown-row"><div>70% Rule MAO (ARV × 70% − Repairs)</div><div style="font-weight:700">' + fc(rule70) + '</div></div>' +
           '<div class="breakdown-row"><div>Your MAO</div><div style="font-weight:700">' + fc(mao) + '</div></div>' +
+          (purchasePrice > 0 ? '<div class="breakdown-row"><div>Your Offer to Seller</div><div style="font-weight:700">' + fc(purchasePrice) + '</div></div>' : '') +
           '<div style="margin-top:8px;padding:10px 12px;border-radius:8px;font-weight:600;font-size:13px;background:' + (rule70Pass ? '#f0fff4' : '#fff5f5') + ';color:' + (rule70Pass ? '#276749' : '#9b2c2c') + '">' +
-          (rule70Pass ? '✅ Your MAO is at or below the 70% rule - solid upside for your cash buyer.' : '⚠️ Your MAO exceeds the 70% rule. Consider reducing your offer or fee.') +
+          (rule70Pass ? '✅ Your offer is within the MAO - the deal works for everyone.' : '⚠️ Your offer exceeds the MAO. You are offering the seller more than the deal supports. Lower your offer or adjust your costs.') +
           '</div>' +
           '</div>';
         rc.appendChild(dm);
