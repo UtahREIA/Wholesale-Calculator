@@ -145,6 +145,8 @@
     /* ═══════════════════════════════════════════════
    CARDS
 ═══════════════════════════════════════════════ */
+    .subtitle { text-align: center; color: var(--muted); margin-bottom: 12px; }
+
     .card {
       background: var(--card-bg);
       padding: 14px;
@@ -1010,21 +1012,23 @@
 <body>
 
   <!-- ══ PHONE GATE ══ -->
-  <div class="wrap" id="gateWrap">
-    <div class="top"><img alt="UTAH REIA logo" src="https://assets.cdn.filesafe.space/DNirEjy0ejVwbHsaBYrn/media/682f680ec314718407baed82.png" /></div>
-    <h1 style="text-align:center;color:var(--blue);margin-top:12px">Wholesale Calculator Access</h1>
-    <div class="subtitle" style="margin-bottom:16px">Enter your phone number to unlock the calculator.</div>
-    <div class="card">
-      <div class="field">
-        <label>Phone Number</label>
-        <input id="gatePhone" inputmode="tel" placeholder="(801) 555-1234" style="font-size:16px;padding:12px" type="tel" />
+  <div id="gateWrap" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--page-bg);padding:20px">
+    <div style="width:100%;max-width:520px;background:#fff;border-radius:var(--radius);box-shadow:0 20px 60px rgba(10,20,30,0.06);padding:28px 24px">
+      <div class="top"><img alt="UTAH REIA logo" src="https://assets.cdn.filesafe.space/DNirEjy0ejVwbHsaBYrn/media/682f680ec314718407baed82.png" /></div>
+      <h1 style="text-align:center;color:var(--blue);margin-top:12px">Wholesale Calculator Access</h1>
+      <div class="subtitle" style="margin-bottom:16px">Enter your phone number to unlock the calculator.</div>
+      <div class="card">
+        <div class="field">
+          <label>Phone Number</label>
+          <input id="gatePhone" inputmode="tel" placeholder="(801) 555-1234" style="font-size:16px;padding:12px" type="tel" />
+        </div>
+        <div class="field">
+          <button class="btn" id="gateSubmitBtn" style="width:100%;margin-top:8px" type="button">Unlock Calculator</button>
+        </div>
+        <div class="muted-small" id="gateMessage" style="margin-top:8px;min-height:18px;color:#b00020;text-align:center"></div>
       </div>
-      <div class="field">
-        <button class="btn" id="gateSubmitBtn" style="width:100%;margin-top:8px" type="button">Unlock Calculator</button>
-      </div>
-      <div class="muted-small" id="gateMessage" style="margin-top:8px;min-height:18px;color:#b00020;text-align:center"></div>
+      <div style="text-align:center;margin-top:12px;color:var(--muted);font-size:13px">For UTAH REIA members only. Need access? Contact us.</div>
     </div>
-    <div style="text-align:center;margin-top:12px;color:var(--muted);font-size:13px">For UTAH REIA members only. Need access? Contact us.</div>
   </div>
 
   <div id="trialReminder" style="display:none;background:#fffbe6;border:1px solid #ffe58f;color:#ad6800;padding:10px;margin:10px 0 18px 0;font-weight:bold;text-align:center;border-radius:8px;font-size:15px;"></div>
@@ -1366,11 +1370,10 @@
                 under.</div>
             </div>
             <div class="field">
-              <label>Your MAO <span style="font-weight:400;color:var(--muted)">(from your full cost
-                  inputs)</span></label>
+              <label>Assignment Fee <span style="font-weight:400;color:var(--muted)">(Investor Price − Your Offer to Seller)</span></label>
               <input id="rule70YourMao" type="text" readonly
-                style="background:#fff;font-weight:700;color:var(--blue)" />
-              <div class="muted-small" style="margin-top:3px">Calculated from all your costs across every step.</div>
+                style="background:#fff;font-weight:700;color:var(--green)" />
+              <div class="muted-small" style="margin-top:3px">Your profit — what you keep when you assign the contract.</div>
             </div>
           </div>
           <div id="rule70Verdict" class="verdict"
@@ -2043,9 +2046,11 @@
       const rule70 = arv * 0.70 - repairs;
       const investorPrice = Math.max(0, mao) + fee;
 
+      const purchasePrice = uc($('purchasePrice').value) || 0;
+      const assignmentFee = investorPrice - purchasePrice;
       if ($('investorPurchasePrice')) $('investorPurchasePrice').value = arv ? fc(investorPrice) : '-';
       if ($('rule70Mao')) $('rule70Mao').value = arv ? fc(rule70) : '-';
-      if ($('rule70YourMao')) $('rule70YourMao').value = arv ? fc(mao) : '-';
+      if ($('rule70YourMao')) $('rule70YourMao').value = arv ? fc(assignmentFee) : '-';
       // Update MAO display box
       const maoBox = $('maoDisplayBox');
       if (maoBox) maoBox.textContent = arv ? (fc(mao) + (mao < 0 ? ' ⚠️' : ' ✅')) : '-';
@@ -2178,6 +2183,7 @@
           '<div class="breakdown-row"><div>Your Offer to Seller</div><div>' + fc(purchasePrice) + '</div></div>' +
           '<div class="breakdown-row"><div>Investor Buys From You <span style="font-size:12px;color:var(--muted)">(MAO + your fee)</span></div><div style="font-weight:700;color:var(--blue)">' + fc(investorPrice) + '</div></div>' +
           '<div class="breakdown-row"><div>Your Wholesale Fee <span style="font-size:12px;color:var(--muted)">(your profit)</span></div><div style="font-weight:700;color:var(--green)">' + fc(fee) + '</div></div>' +
+          '<div class="breakdown-row"><div>Assignment Fee <span style="font-size:12px;color:var(--muted)">(Investor Price - Your Offer to Seller)</span></div><div style="font-weight:700;color:var(--green)">' + fc(investorPrice - purchasePrice) + '</div></div>' +
           '<div class="breakdown-row"><div>Total Financing (Loans) <span style="font-size:12px;color:var(--muted)">- amount financed, not your out-of-pocket</span></div><div>' + fc(loanAmt) + '</div></div>' +
           '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee">' +
           '<div style="font-weight:700;margin-bottom:8px;font-size:13px;color:var(--blue)">⚡ 70% Rule Check</div>' +
