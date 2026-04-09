@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { phone, approved, processed, name, contact_id } = req.body;
+    const { phone, approved, name } = req.body;
 
     console.log(`📞 Verification request: ${phone} - Approved: ${approved}`);
 
@@ -58,9 +58,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           fields: {
             'Approval Status': approved,
-            'Processed': processed,
             'Name': name || '',
-            'Contact ID': contact_id || '',
             'Timestamp': new Date().toISOString()
           }
         })
@@ -81,9 +79,7 @@ export default async function handler(req, res) {
           fields: {
             'Phone Number': phone,
             'Approval Status': approved,
-            'Processed': processed,
             'Name': name || '',
-            'Contact ID': contact_id || '',
             'Timestamp': new Date().toISOString()
           }
         })
