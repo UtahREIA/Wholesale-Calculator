@@ -2009,8 +2009,9 @@
       // Always read repairs from the field directly - covers both manual entry and itemized total
       const repairsFieldVal = uc($('repairs').value) || 0;
       const repairs = repairsFieldVal || (editorState.rehabManualOnly ? editorState.rehabManualBase : editorState.rehabExtras);
-      // Purchase Cost: include ALL costs (upfront + rolled) per boss formula
-      const closing = editorState.purchaseManualOnly ? editorState.purchaseManualBase : (editorState.purchaseExtrasUpfront + editorState.purchaseExtrasRolled);
+      // Purchase Cost: read field directly first (covers live typing), fallback to editorState
+      const closingFieldVal = uc(($('purchaseClosing') || {}).value) || 0;
+      const closing = closingFieldVal || (editorState.purchaseManualOnly ? editorState.purchaseManualBase : (editorState.purchaseExtrasUpfront + editorState.purchaseExtrasRolled));
       const hMonths = Number(($('holdingTime') || {}).value) || 0;
       const holdMonthly = editorState.holdingManualOnly ? editorState.holdingMonthlyBase : (editorState.holdingMonthlyExtras || 0);
       let interest = 0; loans.forEach(l => { interest += (l.financed * (l.rate / 100) / 12) * hMonths; });
@@ -2079,7 +2080,8 @@
         }
 
         const repairs = uc($('repairs').value) || (editorState.rehabManualOnly ? editorState.rehabManualBase : editorState.rehabExtras);
-        const closing = editorState.purchaseManualOnly ? editorState.purchaseManualBase : (editorState.purchaseExtrasUpfront + editorState.purchaseExtrasRolled);
+        const closingFieldVal = uc(($('purchaseClosing') || {}).value) || 0;
+        const closing = closingFieldVal || (editorState.purchaseManualOnly ? editorState.purchaseManualBase : (editorState.purchaseExtrasUpfront + editorState.purchaseExtrasRolled));
         const hMonths = Number(($('holdingTime') || {}).value) || 0;
         const holdMonthly = editorState.holdingManualOnly ? editorState.holdingMonthlyBase : (editorState.holdingMonthlyExtras || 0);
         let interest = 0; loans.forEach(l => { interest += (l.financed * (l.rate / 100) / 12) * hMonths; });
@@ -2348,7 +2350,7 @@
             if (editorState.rehabManualOnly) editorState.rehabExtras = raw;
           }
           if (id === 'holdingMonthly') editorState.holdingMonthlyBase = raw;
-          if (id === 'purchaseClosing' && editorState.purchaseManualOnly) editorState.purchaseManualBase = raw;
+          if (id === 'purchaseClosing') editorState.purchaseManualBase = raw;
           recalcAllEditors(); updateVisibleTotals(); updateStep3();
         });
 
@@ -2360,7 +2362,7 @@
             if (editorState.rehabManualOnly) editorState.rehabExtras = raw;
           }
           if (id === 'holdingMonthly' && raw) editorState.holdingMonthlyBase = raw;
-          if (id === 'purchaseClosing' && raw && editorState.purchaseManualOnly) editorState.purchaseManualBase = raw;
+          if (id === 'purchaseClosing' && raw) editorState.purchaseManualBase = raw;
           el.value = raw ? fc(raw) : '';
           recalcAllEditors(); updateVisibleTotals(); updateStep3();
         });
