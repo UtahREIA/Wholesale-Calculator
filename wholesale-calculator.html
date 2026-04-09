@@ -2029,7 +2029,8 @@
         const annualNOI = (grossRent * (1 - vacancy / 100) * 12) - (opEx * 12);
         const maxAllIn = coc > 0 ? (annualNOI / coc) * 100 : 0;
         editorState.rentalMaxAllIn = maxAllIn; editorState.rentalAnnualNOI = annualNOI;
-        return maxAllIn - repairs - closing - holding - sales - fee;
+        // Rental investors hold the property - no selling costs apply to their MAO
+        return maxAllIn - repairs - closing - holding - fee;
       }
     }
 
@@ -2135,7 +2136,7 @@
           '<div class="line"><div>Purchase Costs <span style="font-size:11px;opacity:0.65">- title, escrow, inspection, fees at closing</span></div><div>' + fc(closing) + '</div></div>' +
           (loanAmt > 0 ? '<div class="line"><div>Total Financing</div><div>' + fc(loanAmt) + '</div></div>' : '') +
           '<div class="line"><div>Holding Costs (' + hMonths + ' mo) <span style="font-size:11px;opacity:0.65">- taxes, insurance, utilities + loan interest</span></div><div>' + fc(holding) + '</div></div>' +
-          '<div class="line"><div>Selling Costs <span style="font-size:11px;opacity:0.65">- agent commissions + title on the exit sale</span></div><div>' + fc(sales) + '</div></div>' +
+          (investorType === 'flipper' ? '<div class="line"><div>Selling Costs <span style="font-size:11px;opacity:0.65">- agent commissions + title on the exit sale</span></div><div>' + fc(sales) + '</div></div>' : '') +
           (investorType === 'flipper' ? '<div class="line"><div>Flipper\'s Profit <span style="font-size:11px;opacity:0.65">- your buyer\'s required return on the deal</span></div><div>' + fc(buyerProfit) + '</div></div>' : '') +
           rentalExtra +
           '<div class="line"><div>Your Wholesale Fee <span style="font-size:11px;opacity:0.65">- your profit as the wholesaler</span></div><div>' + fc(fee) + '</div></div>' +
@@ -2158,7 +2159,7 @@
           '<div class="breakdown-row"><div>Purchase Costs</div><div>– ' + fc(closing) + '</div></div>' +
           '<div class="breakdown-row"><div>Holding (' + hMonths + ' mo)</div><div>– ' + fc(holding) + '</div></div>' +
           (interest > 0 ? '<div class="breakdown-row" style="font-size:12px;color:var(--muted)"><div>&nbsp;&nbsp;└ Loan Interest</div><div>– ' + fc(interest) + '</div></div>' : '') +
-          '<div class="breakdown-row"><div>Selling Costs</div><div>– ' + fc(sales) + '</div></div>' +
+          (investorType === 'flipper' ? '<div class="breakdown-row"><div>Selling Costs</div><div>– ' + fc(sales) + '</div></div>' : '') +
           (investorType === 'flipper' ? '<div class="breakdown-row"><div>Flipper\'s Profit</div><div>– ' + fc(buyerProfit) + '</div></div>' : '') +
           '<div class="breakdown-row"><div>Wholesale Fee</div><div>– ' + fc(fee) + '</div></div>' +
           '<div class="breakdown-row total"><div>Max Allowable Offer (MAO)</div><div style="color:' + (isGood ? 'var(--green)' : '#d9534f') + '">' + fc(mao) + '</div></div>' +
