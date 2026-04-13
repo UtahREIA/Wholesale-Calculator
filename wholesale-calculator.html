@@ -1176,6 +1176,12 @@
       <!-- ══════════════ STEP 3: Rehab Costs ══════════════ -->
       <div class="card step" data-step="3">
         <div class="muted">Rehab Costs</div>
+        <div id="rehabImportBanner" style="display:none;background:#f0f7ff;border:1px solid #b3d1f5;border-radius:8px;padding:10px 14px;margin-bottom:10px;align-items:center;gap:10px;flex-wrap:wrap">
+          <span style="font-size:13px;color:#1a2a4f">📋 Rehab Estimator data available: <strong id="rehabImportTotal"></strong></span>
+          <button onclick="importRehabData()" style="background:#001F3F;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:13px;cursor:pointer;font-weight:600">Import Total</button>
+          <span id="rehabImportMsg" style="font-size:12px;color:green;display:none">✓ Imported!</span>
+        </div>
+        <p style="margin-bottom:10px;font-size:12px;color:#888">Need to estimate rehab costs? <a href="https://utahreia.org/rehab-estimator-page" target="_blank" style="color:#1a6fc4">Open Rehab Estimator →</a></p>
         <div class="field" style="margin-bottom:8px"><label>Repair Costs (Total)</label><input id="repairs"
             placeholder="$25,000" type="text" /></div>
         <div class="toggle-row">
@@ -2471,6 +2477,40 @@
       } catch (e) { alert(e.message); }
       $('gateSubmitBtn').innerText = 'Unlock Calculator';
     };
+
+    // ── Rehab Estimator Import ──────────────────────────────────────────
+    function checkRehabImport() {
+      try {
+        var raw = localStorage.getItem('ureia_rehab_export');
+        if (!raw) return;
+        var data = JSON.parse(raw);
+        if (!data || !data.grandTotal) return;
+        var banner = document.getElementById('rehabImportBanner');
+        if (!banner) return;
+        banner.style.display = 'flex';
+        var totalEl = document.getElementById('rehabImportTotal');
+        if (totalEl) totalEl.textContent = '$' + Number(data.grandTotal).toLocaleString(undefined, {minimumFractionDigits:0,maximumFractionDigits:0});
+      } catch(e) {}
+    }
+    function importRehabData() {
+      try {
+        var raw = localStorage.getItem('ureia_rehab_export');
+        if (!raw) return;
+        var data = JSON.parse(raw);
+        if (!data || !data.grandTotal) return;
+        var el = document.getElementById('repairs');
+        if (!el) return;
+        el.value = '$' + Number(data.grandTotal).toLocaleString(undefined, {minimumFractionDigits:0,maximumFractionDigits:0});
+        el.dispatchEvent(new Event('input', {bubbles:true}));
+        el.dispatchEvent(new Event('change', {bubbles:true}));
+        var msg = document.getElementById('rehabImportMsg');
+        if (msg) { msg.style.display = 'inline'; setTimeout(function(){ msg.style.display = 'none'; }, 3000); }
+      } catch(e) {}
+    }
+    window.addEventListener('load', checkRehabImport);
+    window.addEventListener('storage', function(e) {
+      if (e.key === 'ureia_rehab_export') checkRehabImport();
+    });
   </script>
 </body>
 

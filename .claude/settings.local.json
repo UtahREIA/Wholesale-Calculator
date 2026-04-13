@@ -3,7 +3,8 @@
     "allow": [
       "Bash(powershell -ExecutionPolicy Bypass -File \"c:\\\\Users\\\\david\\\\Downloads\\\\Wholesale-Calculator\\\\read_xlsx.ps1\")",
       "Bash(node -e ':*)",
-      "Bash(curl -X POST https://services.leadconnectorhq.com/hooks/DNirEjy0ejVwbHsaBYrn/webhook-trigger/6b1ff351-bf3a-48c3-b4dd-a6ce17ace483 -H 'Content-Type: application/json' -d '{\"name\":\"John Doe\",\"email\":\"john@example.com\",\"phone\":\"8015551234\",\"surveyName\":\"BRRRR Readiness Survey 2\",\"calculatorType\":\"BRRRR\",\"interests\":[\"BRRRR\",\"Fix & Flip\"],\"accessStatus\":\"Pending\",\"priorityScore\":55,\"priorityLevel\":\"Medium\",\"isNewRequest\":true,\"newInterestAdded\":true,\"airtableRecordId\":\"recXXXXXXXXXXXXXX\",\"submittedAt\":\"2026-04-10T12:00:00.000Z\"}')"
+      "Bash(curl -X POST https://services.leadconnectorhq.com/hooks/DNirEjy0ejVwbHsaBYrn/webhook-trigger/6b1ff351-bf3a-48c3-b4dd-a6ce17ace483 -H 'Content-Type: application/json' -d '{\"name\":\"John Doe\",\"email\":\"john@example.com\",\"phone\":\"8015551234\",\"surveyName\":\"BRRRR Readiness Survey 2\",\"calculatorType\":\"BRRRR\",\"interests\":[\"BRRRR\",\"Fix & Flip\"],\"accessStatus\":\"Pending\",\"priorityScore\":55,\"priorityLevel\":\"Medium\",\"isNewRequest\":true,\"newInterestAdded\":true,\"airtableRecordId\":\"recXXXXXXXXXXXXXX\",\"submittedAt\":\"2026-04-10T12:00:00.000Z\"}')",
+      "Bash(git -C \"c:/Users/david/Downloads/Wholesale-Calculator\" show HEAD:\"Calculators/BRRRR Calculator/brrrr.html\")"
     ]
   }
 }
