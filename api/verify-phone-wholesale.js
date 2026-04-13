@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     // Airtable credentials for wholesale calculator
     const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY_WHOLESALE;
     const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID_WHOLESALE;
-    const AIRTABLE_TABLE = 'Verifications';
+    const AIRTABLE_TABLE = process.env.AIRTABLE_TABLE_NAME_WHOLESALE || "Verifications";;
 
     if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
       console.error('❌ Missing Airtable credentials');
