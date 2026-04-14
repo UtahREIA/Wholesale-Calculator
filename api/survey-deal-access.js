@@ -9,6 +9,10 @@
 //   AIRTABLE_TABLE_DEAL_ACCESS     — Table name (default: "Deal Access Requests")
 //   GHL_WEBHOOK_SECRET             — Optional: shared secret to validate GHL calls
 
+// Active member check uses Airtable "Member Status" field (value: "Active" or "Inactive").
+// GHL tags are NOT used for this purpose.
+const ACTIVE_MEMBER_STATUS = "active";
+
 // Survey names that should be IGNORED (do not add to deal-access).
 // Keep this list lowercase for case-insensitive comparison.
 const EXCLUDED_SURVEYS = [
@@ -147,18 +151,26 @@ export default async function handler(req, res) {
       }
     }
 
+    // Active members (Member Status = "Active" in Airtable) are auto-approved.
+    // Never downgrade a previously set manual decision.
+    const isActiveMember = (existingFields["Member Status"] || "").toLowerCase() === ACTIVE_MEMBER_STATUS;
+    const existingStatus = existingFields["Access Status"];
+    const accessStatus   = existingStatus && existingStatus !== "Pending"
+      ? existingStatus
+      : isActiveMember ? "Approved" : "Pending";
+
     // ---- Build the Airtable fields to write ----
     const capitalizedName = capitalizeName(name);
 
     const fields = {
-      ...(capitalizedName                    ? { "Name":            capitalizedName }      : {}),
-      ...(email                              ? { "Email":           email.toLowerCase() }  : {}),
-      ...(normalizedPhone                    ? { "Phone Number":    normalizedPhone }       : {}),
-      ...(contactId                          ? { "GHL Contact ID":  contactId }             : {}),
+      ...(capitalizedName ? { "Name":           capitalizedName }     : {}),
+      ...(email           ? { "Email":          email.toLowerCase() } : {}),
+      ...(normalizedPhone ? { "Phone Number":   normalizedPhone }      : {}),
+      ...(contactId       ? { "GHL Contact ID": contactId }            : {}),
       "Survey Name":     surveyName,
       "Calculator Type": resolveCalculatorType(surveyName),
       "Request Date":    today,
-      "Access Status":   existingFields["Access Status"] || "Pending", // never overwrite a manual decision
+      "Access Status":   accessStatus,
       ...(notes ? { "Notes": notes } : {}),
     };
 
