@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Utah REIA — BRRRR Calculator Follow-Up Workflow Brief</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 14px;
+      color: #1a1a2e;
+      background: #f5f7fa;
+      padding: 40px 20px;
+    }
+
+    .page {
+      max-width: 820px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: #001F3F;
+      color: #fff;
+      padding: 36px 40px 28px;
+    }
+    .header .label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #7ecba1;
+      margin-bottom: 8px;
+    }
+    .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+    .header .subtitle { font-size: 13px; color: #b0c4d8; }
+    .header .meta {
+      margin-top: 18px;
+      display: flex;
+      gap: 24px;
+      font-size: 12px;
+      color: #7ecba1;
+      flex-wrap: wrap;
+    }
+
+    /* ── Body ── */
+    .body { padding: 36px 40px; }
+    section { margin-bottom: 36px; }
+
+    h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #001F3F;
+      border-bottom: 2px solid #e8edf2;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2E8B57;
+      margin-bottom: 8px;
+      margin-top: 16px;
+    }
+    p { line-height: 1.7; color: #333; margin-bottom: 10px; }
+    ul { padding-left: 20px; margin-bottom: 10px; }
+    ul li { line-height: 1.8; color: #333; }
+
+    /* ── Flow diagram ── */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin: 16px 0;
+      border-left: 3px solid #c3d9f7;
+      padding-left: 20px;
+    }
+    .flow-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 10px 0;
+      position: relative;
+    }
+    .flow-row::before {
+      content: '';
+      position: absolute;
+      left: -26px;
+      top: 16px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #001F3F;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px #001F3F;
+    }
+    .flow-tag {
+      background: #001F3F;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+      min-width: 110px;
+      text-align: center;
+    }
+    .flow-tag.green  { background: #2E8B57; }
+    .flow-tag.orange { background: #c05000; }
+    .flow-tag.grey   { background: #555; }
+    .flow-desc { font-size: 13px; color: #333; line-height: 1.6; }
+    .flow-desc strong { color: #001F3F; }
+
+    /* ── Info boxes ── */
+    .info-box {
+      background: #f0f6ff;
+      border-left: 4px solid #001F3F;
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin: 12px 0;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .info-box.green  { background: #e8f5ee; border-color: #2E8B57; }
+    .info-box.yellow { background: #fffbe6; border-color: #f0a500; }
+    .info-box.dark   { background: #1a1a2e; border-color: #001F3F; color: #7ecba1; font-family: 'Courier New', monospace; font-size: 12.5px; }
+
+    /* ── Message cards ── */
+    .msg-card {
+      border: 1.5px solid #e0e6ef;
+      border-radius: 10px;
+      margin: 14px 0;
+      overflow: hidden;
+    }
+    .msg-header {
+      background: #001F3F;
+      color: #fff;
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .msg-header .step-badge {
+      background: #2E8B57;
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+    }
+    .msg-body { padding: 0; }
+    .msg-section {
+      padding: 12px 16px;
+      border-bottom: 1px solid #f0f2f5;
+    }
+    .msg-section:last-child { border-bottom: none; }
+    .msg-type {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .msg-type.sms   { color: #c05000; }
+    .msg-type.email { color: #001F3F; }
+    .msg-text {
+      font-size: 13px;
+      line-height: 1.7;
+      color: #333;
+      white-space: pre-wrap;
+    }
+    .msg-subject {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 6px;
+    }
+    .msg-subject strong { color: #001F3F; }
+    .url-placeholder {
+      display: inline-block;
+      background: #fff8e1;
+      border: 1.5px dashed #f0a500;
+      color: #8a5c00;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 8px;
+      border-radius: 4px;
+    }
+
+    /* ── Table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 10px 0;
+    }
+    th {
+      background: #001F3F;
+      color: #fff;
+      text-align: left;
+      padding: 9px 12px;
+      font-weight: 600;
+    }
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #eef0f3;
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: #f8fafc; }
+
+    /* ── Code block ── */
+    .code-block {
+      background: #1a1a2e;
+      color: #7ecba1;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-family: 'Courier New', monospace;
+      font-size: 12.5px;
+      margin: 10px 0;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+    .code-block .key   { color: #f0a500; }
+    .code-block .val   { color: #7ecba1; }
+    .code-block .cmt   { color: #555; }
+
+    code {
+      background: #f0f2f5;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: #c0392b;
+    }
+
+    /* ── Checklist ── */
+    .checklist { list-style: none; padding: 0; }
+    .checklist li {
+      padding: 8px 0 8px 32px;
+      border-bottom: 1px solid #f0f2f5;
+      position: relative;
+      color: #333;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li::before {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 11px;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #2E8B57;
+      border-radius: 3px;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 3px;
+      margin-left: 6px;
+      text-transform: uppercase;
+      vertical-align: middle;
+    }
+    .tag.ghl    { background: #fff0e6; color: #c05000; }
+    .tag.vercel { background: #e8eeff; color: #2040a0; }
+    .tag.done   { background: #e8f5ee; color: #2E8B57; }
+
+    /* ── Two col ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    /* ── Footer ── */
+    .footer {
+      background: #f5f7fa;
+      border-top: 1px solid #e8edf2;
+      padding: 18px 40px;
+      font-size: 11px;
+      color: #888;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .page { box-shadow: none; border-radius: 0; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="label">Utah REIA — Internal Tech Brief</div>
+    <h1>BRRRR Calculator Follow-Up Automation</h1>
+    <div class="subtitle">Behavior-triggered nurture sequence — fires when a member unlocks the BRRRR calculator via the phone gate</div>
+    <div class="meta">
+      <span>Date: April 14, 2026</span>
+      <span>Status: Code Complete — GHL Workflow Built, URLs Pending</span>
+      <span>Trigger: Phone Gate Access</span>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- Overview -->
+    <section>
+      <h2>Overview</h2>
+      <p>
+        When a Utah REIA member unlocks the BRRRR calculator by entering their phone number, an automated follow-up sequence fires in GoHighLevel. The sequence connects them with the three most important resources for executing a BRRRR deal — refinance help, vetted contractors, and next-step education — delivered over 5 days in both SMS and email.
+      </p>
+      <div class="info-box green">
+        <strong>The logic in plain English:</strong><br>
+        Member unlocks BRRRR calculator → GHL identifies who they are by phone number → sends a 4-step resource sequence over 5 days (SMS + Email each step).
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section>
+      <h2>How It Works — Full Chain</h2>
+
+      <div class="flow">
+        <div class="flow-row">
+          <div class="flow-tag">CALCULATOR</div>
+          <div class="flow-desc">Member enters their phone number into the BRRRR calculator phone gate and clicks <strong>"Unlock Calculator"</strong></div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-tag">CALCULATOR</div>
+          <div class="flow-desc">Phone is verified against Airtable. On success, the calculator fires a silent background POST request to the Vercel API — the member never sees this happen and there is no delay</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-tag grey">VERCEL API</div>
+          <div class="flow-desc">
+            The <strong>/api/track-event</strong> endpoint receives the payload and forwards it to the GHL inbound webhook URL stored as an environment variable<br>
+            <div class="code-block" style="margin-top:8px;">
+              &#123; <span class="key">"phone"</span>: <span class="val">"8015551234"</span>, <span class="key">"calculator"</span>: <span class="val">"BRRRR"</span>, <span class="key">"event"</span>: <span class="val">"calculator_access"</span>, <span class="key">"timestamp"</span>: <span class="val">"2026-04-14T18:30:00Z"</span> &#125;
+            </div>
+          </div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-tag orange">GHL</div>
+          <div class="flow-desc">GHL inbound webhook triggers the <strong>"BRRRR Access — Resource Nurture"</strong> workflow</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-tag orange">GHL</div>
+          <div class="flow-desc"><strong>Find Contact</strong> action looks up the CRM contact whose phone matches <code>{{trigger.phone}}</code> — this is what makes <code>{{contact.first_name}}</code> work in all messages</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-tag green">MESSAGES</div>
+          <div class="flow-desc">4-step SMS + Email sequence fires over 5 days — each step tailored to a specific BRRRR resource (see message content below)</div>
+        </div>
+      </div>
+
+      <div class="info-box yellow">
+        <strong>Important:</strong> The <strong>Find Contact</strong> step in GHL is what connects the phone number to a real contact record. Without it, GHL cannot personalise the messages with the member's name. This step has already been added to the workflow.
+      </div>
+    </section>
+
+    <!-- Why the name works -->
+    <section>
+      <h2>Why {{contact.first_name}} Works</h2>
+      <p>The webhook only sends a phone number. GHL on its own cannot personalise messages from just a phone number — it needs to know which contact record that phone belongs to.</p>
+      <div class="two-col">
+        <div class="info-box" style="margin:0;">
+          <strong>Without Find Contact</strong><br><br>
+          GHL receives the phone number but has no contact context.<br><br>
+          <code>{{contact.first_name}}</code> renders blank.<br><br>
+          Messages go out with no name.
+        </div>
+        <div class="info-box green" style="margin:0;">
+          <strong>With Find Contact ✓</strong><br><br>
+          GHL looks up the contact by phone in the CRM.<br><br>
+          <code>{{contact.first_name}}</code> renders correctly.<br><br>
+          Messages are fully personalised.
+        </div>
+      </div>
+    </section>
+
+    <!-- GHL Workflow Structure -->
+    <section>
+      <h2>GHL Workflow Structure</h2>
+      <table>
+        <tr><th>Step</th><th>Type</th><th>Timing</th><th>Purpose</th></tr>
+        <tr><td>Trigger</td><td>Inbound Webhook</td><td>Immediate</td><td>Receives calculator access event</td></tr>
+        <tr><td>Action 1</td><td>Find Contact</td><td>Immediate</td><td>Looks up contact by <code>{{trigger.phone}}</code></td></tr>
+        <tr><td>Action 2</td><td>SMS + Email</td><td>Immediate</td><td>Welcome — you're on the right path</td></tr>
+        <tr><td>Wait</td><td>Delay</td><td>+1 Day</td><td>—</td></tr>
+        <tr><td>Action 3</td><td>SMS + Email</td><td>Day 1</td><td>Refinance resources</td></tr>
+        <tr><td>Wait</td><td>Delay</td><td>+2 Days</td><td>—</td></tr>
+        <tr><td>Action 4</td><td>SMS + Email</td><td>Day 3</td><td>Contractor resources</td></tr>
+        <tr><td>Wait</td><td>Delay</td><td>+2 Days</td><td>—</td></tr>
+        <tr><td>Action 5</td><td>SMS + Email</td><td>Day 5</td><td>Next-step education</td></tr>
+      </table>
+    </section>
+
+    <!-- Message Content -->
+    <section>
+      <h2>Message Content</h2>
+      <p>All messages use <code>{{contact.first_name}}</code> for personalisation. URLs marked <span class="url-placeholder">[ URL ]</span> need to be filled in before the workflow is published.</p>
+
+      <!-- Step 1 -->
+      <div class="msg-card">
+        <div class="msg-header">
+          Step 1 — Immediate &nbsp;|&nbsp; Welcome
+          <span class="step-badge">No URL needed</span>
+        </div>
+        <div class="msg-body">
+          <div class="msg-section">
+            <div class="msg-type sms">SMS</div>
+            <div class="msg-text">You just unlocked the BRRRR calculator — that means you're serious. Most people talk about investing. You're running the numbers. Utah REIA has your back every step of the way. More resources coming your way this week. Let's get it. 💪</div>
+          </div>
+          <div class="msg-section">
+            <div class="msg-type email">EMAIL</div>
+            <div class="msg-subject"><strong>Subject:</strong> You're already ahead of 90% of investors</div>
+            <div class="msg-text">Hey {{contact.first_name}},
+
+You know what most people do when they think about real estate investing? They Google it, get overwhelmed, and go back to their 9-5.
+
+You just opened a BRRRR calculator and started running numbers.
+
+That's the difference between dreaming and doing.
+
+BRRRR is one of the most powerful wealth-building strategies in real estate — Buy, Rehab, Rent, Refinance, Repeat. Done right, you can recycle the same capital over and over and build a portfolio faster than almost any other strategy.
+
+Over the next few days, we're sending you the exact resources Utah REIA members use to execute BRRRR deals — refinance connections, contractors, and the education to put it all together.
+
+Stay locked in.
+
+— The Utah REIA Team</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="msg-card">
+        <div class="msg-header">
+          Step 2 — Day 1 &nbsp;|&nbsp; Refinance
+          <span class="step-badge">1 URL needed</span>
+        </div>
+        <div class="msg-body">
+          <div class="msg-section">
+            <div class="msg-type sms">SMS</div>
+            <div class="msg-text">The refi is where the BRRRR magic happens — it's how you get your money back out and go again. Don't leave it to chance. Here's where Utah REIA members go for refinance help: <span class="url-placeholder">[ REFINANCE URL ]</span></div>
+          </div>
+          <div class="msg-section">
+            <div class="msg-type email">EMAIL</div>
+            <div class="msg-subject"><strong>Subject:</strong> The step most BRRRR investors get wrong</div>
+            <div class="msg-text">Hey {{contact.first_name}},
+
+Here's where a lot of investors stall on BRRRR — they nail the buy, they rehab the property, they get a tenant in… and then they don't know who to call for the refi.
+
+The refinance is the engine of the whole strategy. It's what gets your capital back so you can repeat the process. Without the right lender, the "Repeat" in BRRRR never happens.
+
+Utah REIA has connected members with lenders who understand BRRRR — they know the timeline, they know how to value a rehabbed rental, and they're not going to slow you down.
+
+Get connected here: <span class="url-placeholder">[ REFINANCE URL ]</span>
+
+Don't skip this step. Your next deal depends on it.
+
+— The Utah REIA Team</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="msg-card">
+        <div class="msg-header">
+          Step 3 — Day 3 &nbsp;|&nbsp; Contractors
+          <span class="step-badge">1 URL needed</span>
+        </div>
+        <div class="msg-body">
+          <div class="msg-section">
+            <div class="msg-type sms">SMS</div>
+            <div class="msg-text">Your BRRRR deal lives or dies on the rehab. The right contractor = on time, on budget, and rent-ready. The wrong one = blown timeline and blown numbers. Find vetted contractors here: <span class="url-placeholder">[ CONTRACTORS URL ]</span></div>
+          </div>
+          <div class="msg-section">
+            <div class="msg-type email">EMAIL</div>
+            <div class="msg-subject"><strong>Subject:</strong> The rehab will make or break your deal</div>
+            <div class="msg-text">Hey {{contact.first_name}},
+
+You can find a great deal. You can line up the financing. But if your contractor goes MIA on week 3, blows your budget, or delivers work that doesn't pass inspection — your deal falls apart.
+
+The rehab phase is where most first-time BRRRR investors lose money. Not because the deal was bad. Because they picked the wrong contractor.
+
+Utah REIA members don't have to gamble on this. We've built a network of vetted contractors who know what investors need — realistic timelines, fair pricing, and work that holds up.
+
+Find your contractor here: <span class="url-placeholder">[ CONTRACTORS URL ]</span>
+
+Protect your numbers. Protect your deal.
+
+— The Utah REIA Team</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="msg-card">
+        <div class="msg-header">
+          Step 4 — Day 5 &nbsp;|&nbsp; Education
+          <span class="step-badge">1 URL needed</span>
+        </div>
+        <div class="msg-body">
+          <div class="msg-section">
+            <div class="msg-type sms">SMS</div>
+            <div class="msg-text">You've got the tools. Now go deeper. Utah REIA's BRRRR education — deals, coaching, and live events — is built for investors ready to level up: <span class="url-placeholder">[ EDUCATION URL ]</span></div>
+          </div>
+          <div class="msg-section">
+            <div class="msg-type email">EMAIL</div>
+            <div class="msg-subject"><strong>Subject:</strong> Ready to go from one deal to a portfolio?</div>
+            <div class="msg-text">Hey {{contact.first_name}},
+
+Running the calculator is the start. Closing the deal is the next level. Building a portfolio is the goal.
+
+Utah REIA exists to take you all the way there.
+
+Whether you're still analyzing your first BRRRR or you're ready to scale, we have the education, the community, and the coaching to help you execute — not just learn.
+
+Here's what's waiting for you: <span class="url-placeholder">[ EDUCATION URL ]</span>
+
+The investors who win aren't the ones who know the most. They're the ones who take action with the right support around them.
+
+That's what Utah REIA is here for. Let's build something real.
+
+— The Utah REIA Team</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Setup Checklist -->
+    <section>
+      <h2>Setup Checklist — What Still Needs to Be Done</h2>
+      <ul class="checklist">
+        <li>
+          Add env var to both Vercel projects <span class="tag vercel">Vercel</span>
+          <div class="code-block" style="margin-top:8px;font-size:11.5px;">
+            <span class="key">GHL_CALCULATOR_ACCESS_WEBHOOK_URL</span> = https://services.leadconnectorhq.com/hooks/DNirEjy0ejVwbHsaBYrn/webhook-trigger/d0d514b0-c223-471b-b7a0-ab4560267cba
+          </div>
+        </li>
+        <li>Fill in <strong>Refinance URL</strong> in Step 2 SMS and Email <span class="tag ghl">GHL</span></li>
+        <li>Fill in <strong>Contractors URL</strong> in Step 3 SMS and Email <span class="tag ghl">GHL</span></li>
+        <li>Fill in <strong>Education URL</strong> in Step 4 SMS and Email <span class="tag ghl">GHL</span></li>
+        <li>Confirm <strong>Find Contact</strong> action is first in the workflow before any send actions <span class="tag done">Done ✓</span></li>
+        <li>Publish the GHL workflow <span class="tag ghl">GHL</span></li>
+        <li>Test by entering a real phone number into the BRRRR calculator and confirming the GHL workflow fires and the contact receives Step 1 <span class="tag ghl">GHL</span></li>
+      </ul>
+    </section>
+
+    <!-- Technical Reference -->
+    <section>
+      <h2>Technical Reference</h2>
+      <h3>Files Changed</h3>
+      <table>
+        <tr><th>File</th><th>What Changed</th></tr>
+        <tr><td><code>Calculators/api/track-event.js</code></td><td>Updated to route different event types to different GHL webhooks. Added support for <code>calculator_access</code> event alongside the existing <code>pdf_download</code> event.</td></tr>
+        <tr><td><code>Calculators/BRRRR Calculator/brrrr.html</code></td><td>Added a fire-and-forget fetch to <code>/api/track-event</code> immediately after the phone gate unlocks successfully.</td></tr>
+      </table>
+
+      <h3>GHL Webhook Fields Available in Workflow</h3>
+      <table>
+        <tr><th>Field</th><th>Example Value</th><th>How to Use in GHL</th></tr>
+        <tr><td><code>{{trigger.phone}}</code></td><td>8015551234</td><td>Used in the Find Contact action to look up the member</td></tr>
+        <tr><td><code>{{trigger.calculator}}</code></td><td>BRRRR</td><td>Can be used to tag the contact or filter workflow branches</td></tr>
+        <tr><td><code>{{trigger.event}}</code></td><td>calculator_access</td><td>Confirms this is a calculator access event</td></tr>
+        <tr><td><code>{{trigger.timestamp}}</code></td><td>2026-04-14T18:30:00Z</td><td>Logs when the member accessed the calculator</td></tr>
+        <tr><td><code>{{contact.first_name}}</code></td><td>David</td><td>Available after the Find Contact step — use in all messages</td></tr>
+      </table>
+    </section>
+
+  </div><!-- /body -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>Utah REIA — Internal Use Only</span>
+    <span>Prepared April 14, 2026</span>
+    <span class="no-print" style="color:#0055cc; cursor:pointer; font-weight:600;" onclick="window.print()">&#128438; Print / Save as PDF</span>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Utah REIA — Survey Submission Routing Brief</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 14px;
+      color: #1a1a2e;
+      background: #f5f7fa;
+      padding: 40px 20px;
+    }
+
+    .page {
+      max-width: 820px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: #001F3F;
+      color: #fff;
+      padding: 36px 40px 28px;
+    }
+    .header .label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #7ecba1;
+      margin-bottom: 8px;
+    }
+    .header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+    .header .subtitle { font-size: 13px; color: #b0c4d8; line-height: 1.6; }
+    .header .meta {
+      margin-top: 18px;
+      display: flex;
+      gap: 24px;
+      font-size: 12px;
+      color: #7ecba1;
+      flex-wrap: wrap;
+    }
+
+    /* ── Body ── */
+    .body { padding: 36px 40px; }
+    section { margin-bottom: 36px; }
+
+    h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #001F3F;
+      border-bottom: 2px solid #e8edf2;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+    h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2E8B57;
+      margin-bottom: 8px;
+      margin-top: 18px;
+    }
+    p { line-height: 1.7; color: #333; margin-bottom: 10px; }
+    ul { padding-left: 20px; margin-bottom: 10px; }
+    ul li { line-height: 1.9; color: #333; }
+
+    /* ── Info boxes ── */
+    .info-box {
+      background: #f0f6ff;
+      border-left: 4px solid #001F3F;
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin: 12px 0;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .info-box.green  { background: #e8f5ee; border-color: #2E8B57; }
+    .info-box.yellow { background: #fffbe6; border-color: #f0a500; }
+    .info-box.red    { background: #fff0f0; border-color: #cc0000; }
+
+    /* ── Flow ── */
+    .flow {
+      border-left: 3px solid #c3d9f7;
+      padding-left: 20px;
+      margin: 16px 0;
+    }
+    .flow-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 10px 0;
+      position: relative;
+    }
+    .flow-row::before {
+      content: '';
+      position: absolute;
+      left: -26px;
+      top: 14px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #001F3F;
+      border: 2px solid #fff;
+      box-shadow: 0 0 0 2px #001F3F;
+    }
+    .flow-tag {
+      background: #001F3F;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      letter-spacing: 0.5px;
+      margin-top: 2px;
+      min-width: 90px;
+      text-align: center;
+    }
+    .flow-tag.green  { background: #2E8B57; }
+    .flow-tag.orange { background: #c05000; }
+    .flow-tag.grey   { background: #555; }
+    .flow-tag.purple { background: #5c2d91; }
+    .flow-desc { font-size: 13px; color: #333; line-height: 1.6; }
+    .flow-desc strong { color: #001F3F; }
+
+    /* ── Tables ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 12px 0;
+    }
+    th {
+      background: #001F3F;
+      color: #fff;
+      text-align: left;
+      padding: 10px 12px;
+      font-weight: 600;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #eef0f3;
+      vertical-align: top;
+      line-height: 1.6;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: #f8fafc; }
+
+    code {
+      background: #f0f2f5;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: #c0392b;
+    }
+
+    /* ── Score cards ── */
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 14px 0;
+    }
+    .score-card {
+      border: 1.5px solid #e0e6ef;
+      border-radius: 10px;
+      padding: 14px 12px;
+      text-align: center;
+    }
+    .score-card .points {
+      font-size: 28px;
+      font-weight: 800;
+      color: #001F3F;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .score-card .points.green { color: #2E8B57; }
+    .score-card .label {
+      font-size: 11px;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    .priority-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 14px 0;
+    }
+    .priority-card {
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+    .priority-card.high   { background: #e8f5ee; border: 1.5px solid #2E8B57; }
+    .priority-card.medium { background: #fffbe6; border: 1.5px solid #f0a500; }
+    .priority-card.low    { background: #f5f7fa; border: 1.5px solid #ccc; }
+    .priority-card .plevel {
+      font-size: 16px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+    .priority-card.high   .plevel { color: #2E8B57; }
+    .priority-card.medium .plevel { color: #c07000; }
+    .priority-card.low    .plevel { color: #666; }
+    .priority-card .pscore { font-size: 11px; color: #666; margin-bottom: 8px; }
+    .priority-card .pdesc  { font-size: 12px; color: #444; line-height: 1.5; }
+
+    /* ── Survey tags ── */
+    .survey-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .survey-pill {
+      background: #001F3F;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+    .survey-pill.excluded {
+      background: #eee;
+      color: #999;
+      text-decoration: line-through;
+    }
+
+    /* ── Airtable fields ── */
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 12px 0;
+    }
+    .field-item {
+      background: #f8fafc;
+      border: 1px solid #e8edf2;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+    }
+    .field-item .fname { font-weight: 700; color: #001F3F; margin-bottom: 2px; }
+    .field-item .fdesc { color: #555; font-size: 12px; line-height: 1.5; }
+
+    /* ── Checklist ── */
+    .checklist { list-style: none; padding: 0; }
+    .checklist li {
+      padding: 8px 0 8px 32px;
+      border-bottom: 1px solid #f0f2f5;
+      position: relative;
+      color: #333;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li::before {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 11px;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #2E8B57;
+      border-radius: 3px;
+    }
+    .tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 3px;
+      margin-left: 6px;
+      text-transform: uppercase;
+      vertical-align: middle;
+    }
+    .tag.ghl    { background: #fff0e6; color: #c05000; }
+    .tag.vercel { background: #e8eeff; color: #2040a0; }
+    .tag.done   { background: #e8f5ee; color: #2E8B57; }
+    .tag.airtable { background: #f0e6ff; color: #5c2d91; }
+
+    /* ── Footer ── */
+    .footer {
+      background: #f5f7fa;
+      border-top: 1px solid #e8edf2;
+      padding: 18px 40px;
+      font-size: 11px;
+      color: #888;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .page { box-shadow: none; border-radius: 0; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="label">Utah REIA — Internal Tech Brief</div>
+    <h1>Survey Submission Routing System</h1>
+    <div class="subtitle">
+      When a member submits a readiness survey in GHL, this system automatically qualifies them, scores their priority level, routes their record into Airtable, and notifies the admin team — all without any manual work.
+    </div>
+    <div class="meta">
+      <span>Date: April 14, 2026</span>
+      <span>Status: Live &amp; Running</span>
+      <span>Covers: 7 Surveys</span>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- Overview -->
+    <section>
+      <h2>Overview</h2>
+      <p>
+        Utah REIA uses readiness surveys to understand where members are in their investing journey. Every time someone submits one of these surveys, a fully automated system runs in the background to:
+      </p>
+      <ul>
+        <li>Identify who the person is by looking them up in GHL</li>
+        <li>Check whether they are an active paying member</li>
+        <li>Record their calculator interest (BRRRR, Fix &amp; Flip, Wholesale, etc.)</li>
+        <li>Score their priority level so the admin team knows who to follow up with first</li>
+        <li>Save everything to Airtable automatically</li>
+        <li>Notify the admin team instantly</li>
+      </ul>
+      <div class="info-box green">
+        <strong>The bottom line:</strong> The moment someone submits a survey, Utah REIA knows who they are, what they want, how serious they are, and whether they should be approved — before anyone on the team has looked at it.
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section>
+      <h2>How It Works — Full Chain</h2>
+      <div class="flow">
+        <div class="flow-row">
+          <div class="flow-tag orange">GHL</div>
+          <div class="flow-desc">Member submits a readiness survey in GHL (e.g. BRRRR Readiness Survey)</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-tag orange">GHL</div>
+          <div class="flow-desc">GHL workflow fires a webhook to the Vercel API, sending the member's <strong>name, email, phone, and survey name</strong></div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-tag grey">VERCEL</div>
+          <div class="flow-desc">The <strong>/api/survey-deal-access</strong> endpoint receives the submission and begins processing</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-tag grey">VERCEL</div>
+          <div class="flow-desc"><strong>GHL contact lookup:</strong> searches GHL by phone or email to find the contact record and confirm they exist in the CRM</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-tag grey">VERCEL</div>
+          <div class="flow-desc"><strong>Airtable lookup:</strong> checks if this person already has a record in "Deal Access Requests". If yes, updates it. If no, creates a new one.</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-tag grey">VERCEL</div>
+          <div class="flow-desc"><strong>Interest tracking:</strong> adds the new calculator type to their list of interests — previous interests are never erased, they stack over time</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-tag grey">VERCEL</div>
+          <div class="flow-desc"><strong>Priority scoring:</strong> calculates a 0–100 score based on membership status, engagement depth, and whether this is their first submission</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-tag grey">VERCEL</div>
+          <div class="flow-desc"><strong>Access status:</strong> active members are automatically approved. Everyone else is marked Pending for admin review.</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-tag purple">AIRTABLE</div>
+          <div class="flow-desc">The full record is saved to the <strong>"Deal Access Requests"</strong> table in Airtable with all fields populated</div>
+        </div>
+        <div class="flow-row">
+          <div class="flow-tag green">ADMIN</div>
+          <div class="flow-desc">An instant notification fires to the admin team with a summary of the submission, priority score, and access decision</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Surveys Covered -->
+    <section>
+      <h2>Surveys This System Covers</h2>
+      <p>The system automatically recognises these surveys by name and routes them to the correct calculator type:</p>
+      <div class="survey-list">
+        <div class="survey-pill">BRRRR Readiness Survey</div>
+        <div class="survey-pill">Fix &amp; Flip Readiness Survey</div>
+        <div class="survey-pill">Rehab Estimator Readiness Survey</div>
+        <div class="survey-pill">Rental Readiness Survey</div>
+        <div class="survey-pill">Short-Term Rental Readiness Survey</div>
+        <div class="survey-pill">Wholesaler Readiness Survey</div>
+        <div class="survey-pill">Your Path to Success</div>
+        <div class="survey-pill excluded">Rehab Estimator Readiness Survey (old)</div>
+      </div>
+      <p style="font-size:12px; color:#888;">The crossed-out survey is intentionally excluded — it is an old version that has been retired.</p>
+    </section>
+
+    <!-- Priority Scoring -->
+    <section>
+      <h2>How Priority Scoring Works</h2>
+      <p>Every submission receives a score from 0 to 100. This score tells the admin team who needs attention first — without anyone having to manually review every submission.</p>
+
+      <h3>How Points Are Earned</h3>
+      <div class="score-grid">
+        <div class="score-card">
+          <div class="points green">+40</div>
+          <div class="label">Member Status = "Active" in Airtable</div>
+        </div>
+        <div class="score-card">
+          <div class="points">+20</div>
+          <div class="label">Known contact already in GHL</div>
+        </div>
+        <div class="score-card">
+          <div class="points">+10</div>
+          <div class="label">Per calculator interest (up to 5)</div>
+        </div>
+        <div class="score-card">
+          <div class="points">+10</div>
+          <div class="label">First ever submission — fresh lead</div>
+        </div>
+      </div>
+
+      <h3>Priority Levels</h3>
+      <div class="priority-grid">
+        <div class="priority-card high">
+          <div class="plevel">HIGH</div>
+          <div class="pscore">Score 60 or above</div>
+          <div class="pdesc">Active member, engaged, or has multiple interests. Follow up immediately.</div>
+        </div>
+        <div class="priority-card medium">
+          <div class="plevel">MEDIUM</div>
+          <div class="pscore">Score 30 – 59</div>
+          <div class="pdesc">Known contact with some engagement. Worth nurturing soon.</div>
+        </div>
+        <div class="priority-card low">
+          <div class="plevel">LOW</div>
+          <div class="pscore">Score below 30</div>
+          <div class="pdesc">New or unknown contact. Add to nurture sequence and monitor.</div>
+        </div>
+      </div>
+
+      <div class="info-box yellow">
+        <strong>Real example:</strong> A member submits the BRRRR Readiness Survey. They are an active member (+40), already in GHL (+20), and this is their 3rd calculator interest (+30). Their score = 90 → <strong>High Priority</strong>. They are automatically approved and the admin team is notified immediately.
+      </div>
+    </section>
+
+    <!-- Access Status -->
+    <section>
+      <h2>Automatic Access Decisions</h2>
+      <p>The system makes an access decision on every submission — no manual review required for active members.</p>
+      <table>
+        <tr><th>Who Submitted</th><th>Access Status Set</th><th>What Happens Next</th></tr>
+        <tr>
+          <td>Active paying member</td>
+          <td><strong style="color:#2E8B57;">Approved</strong></td>
+          <td>Automatically approved. Admin is notified. No action needed.</td>
+        </tr>
+        <tr>
+          <td>Known GHL contact (not active member)</td>
+          <td><strong style="color:#c07000;">Pending</strong></td>
+          <td>Saved to Airtable for admin review. Admin is notified.</td>
+        </tr>
+        <tr>
+          <td>New contact (not yet in GHL)</td>
+          <td><strong style="color:#c07000;">Pending</strong></td>
+          <td>New record created. Admin is notified. Team can follow up.</td>
+        </tr>
+        <tr>
+          <td>Previously reviewed (manual decision)</td>
+          <td><strong>Kept as-is</strong></td>
+          <td>The system never overwrites a decision already made by the admin team.</td>
+        </tr>
+      </table>
+    </section>
+
+    <!-- Multi-Interest Tracking -->
+    <section>
+      <h2>Multi-Interest Tracking</h2>
+      <p>
+        If a member submits multiple surveys over time — for example the BRRRR survey today and the Fix &amp; Flip survey next month — the system <strong>stacks their interests</strong> rather than replacing them.
+      </p>
+      <div class="info-box">
+        <strong>Example — Same member, three surveys over 6 months:</strong><br><br>
+        January &nbsp;→ BRRRR Readiness Survey &nbsp;&nbsp;&nbsp;&nbsp; Interests recorded: <strong>[BRRRR]</strong><br>
+        March &nbsp;&nbsp;→ Fix &amp; Flip Readiness Survey &nbsp; Interests recorded: <strong>[BRRRR, Fix &amp; Flip]</strong><br>
+        June &nbsp;&nbsp;&nbsp;→ Wholesale Readiness Survey &nbsp;&nbsp; Interests recorded: <strong>[BRRRR, Fix &amp; Flip, Wholesale]</strong><br><br>
+        Their score also increases with each new interest, so they move from Medium to High priority over time.
+      </div>
+    </section>
+
+    <!-- What Is Saved to Airtable -->
+    <section>
+      <h2>What Gets Saved to Airtable</h2>
+      <p>Every submission creates or updates a record in the <strong>"Deal Access Requests"</strong> table with these fields:</p>
+      <div class="field-grid">
+        <div class="field-item">
+          <div class="fname">Name</div>
+          <div class="fdesc">Auto-capitalised from the survey submission</div>
+        </div>
+        <div class="field-item">
+          <div class="fname">Email</div>
+          <div class="fdesc">Stored in lowercase for consistency</div>
+        </div>
+        <div class="field-item">
+          <div class="fname">Phone Number</div>
+          <div class="fdesc">Normalised to 10-digit format</div>
+        </div>
+        <div class="field-item">
+          <div class="fname">GHL Contact ID</div>
+          <div class="fdesc">Links the Airtable record directly to their GHL contact</div>
+        </div>
+        <div class="field-item">
+          <div class="fname">Survey Name</div>
+          <div class="fdesc">The exact survey they submitted</div>
+        </div>
+        <div class="field-item">
+          <div class="fname">Calculator Type</div>
+          <div class="fdesc">Resolved from the survey name (e.g. "BRRRR")</div>
+        </div>
+        <div class="field-item">
+          <div class="fname">Calculator Interests</div>
+          <div class="fdesc">Full list of all strategies they have ever shown interest in</div>
+        </div>
+        <div class="field-item">
+          <div class="fname">Request Date</div>
+          <div class="fdesc">Date of the most recent survey submission</div>
+        </div>
+        <div class="field-item">
+          <div class="fname">Access Status</div>
+          <div class="fdesc">Approved or Pending — never overwritten once manually set</div>
+        </div>
+        <div class="field-item">
+          <div class="fname">Priority Score</div>
+          <div class="fdesc">0–100 numeric score for sorting and filtering</div>
+        </div>
+        <div class="field-item">
+          <div class="fname">Priority Level</div>
+          <div class="fdesc">High / Medium / Low — easy at-a-glance view</div>
+        </div>
+        <div class="field-item">
+          <div class="fname">Notes</div>
+          <div class="fdesc">Any additional notes passed in with the submission</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Setup / Config -->
+    <section>
+      <h2>Configuration — What Needs to Be Set Up</h2>
+      <p>The system runs on environment variables stored in Vercel. These need to be confirmed as active:</p>
+      <table>
+        <tr><th>Variable</th><th>What It Does</th><th>Required?</th></tr>
+        <tr>
+          <td><code>AIRTABLE_API_KEY_DEAL_ACCESS</code></td>
+          <td>Authenticates with Airtable to read/write records</td>
+          <td><strong style="color:#cc0000;">Required</strong></td>
+        </tr>
+        <tr>
+          <td><code>AIRTABLE_BASE_ID_DEAL_ACCESS</code></td>
+          <td>Points to the correct Airtable base</td>
+          <td><strong style="color:#cc0000;">Required</strong></td>
+        </tr>
+        <tr>
+          <td><code>AIRTABLE_TABLE_DEAL_ACCESS</code></td>
+          <td>Table name (defaults to "Deal Access Requests" if not set)</td>
+          <td>Optional</td>
+        </tr>
+        <tr>
+          <td><code>GHL_API_KEY</code></td>
+          <td>Enables GHL contact lookup and active member check</td>
+          <td>Optional but recommended</td>
+        </tr>
+        <tr>
+          <td><code>GHL_LOCATION_ID</code></td>
+          <td>GHL sub-account ID — required alongside GHL_API_KEY</td>
+          <td>Optional but recommended</td>
+        </tr>
+        <tr>
+          <td><code>Member Status</code> <em>(Airtable field)</em></td>
+          <td>Active member check reads this Airtable field — value must be <strong>"Active"</strong> or <strong>"Inactive"</strong>. GHL tags are not used.</td>
+          <td><strong style="color:#cc0000;">Required for auto-approval</strong></td>
+        </tr>
+        <tr>
+          <td><code>ADMIN_NOTIFY_WEBHOOK_URL</code></td>
+          <td>GHL webhook URL that receives the admin notification on every submission</td>
+          <td>Optional but recommended</td>
+        </tr>
+        <tr>
+          <td><code>GHL_WEBHOOK_SECRET</code></td>
+          <td>Security key to verify that requests are genuinely coming from GHL</td>
+          <td>Optional</td>
+        </tr>
+      </table>
+    </section>
+
+    <!-- What's Next -->
+    <section>
+      <h2>What This Enables Next</h2>
+      <p>Now that every survey submission is captured and scored, the next logical step is to use that data to send the right follow-up automatically — routing people to resources that match their specific need.</p>
+      <table>
+        <tr><th>Survey Submitted</th><th>Suggested Follow-Up Routing</th></tr>
+        <tr>
+          <td>BRRRR Readiness Survey</td>
+          <td>Send refinance resources, vetted contractors, BRRRR education</td>
+        </tr>
+        <tr>
+          <td>Fix &amp; Flip Readiness Survey</td>
+          <td>Send rehab estimator, contractor resources, hard money lenders</td>
+        </tr>
+        <tr>
+          <td>Rental Readiness Survey</td>
+          <td>Send property management resources, long-term financing guides</td>
+        </tr>
+        <tr>
+          <td>Short-Term Rental Readiness Survey</td>
+          <td>Send Airbnb/STR setup guides, furnishing resources</td>
+        </tr>
+        <tr>
+          <td>Wholesaler Readiness Survey</td>
+          <td>Send deal-finding resources, contract templates, buyer's list info</td>
+        </tr>
+        <tr>
+          <td>Your Path to Success</td>
+          <td>Send general onboarding, next steps, upcoming events</td>
+        </tr>
+      </table>
+      <div class="info-box green">
+        <strong>This routing is already partially in place.</strong> The BRRRR calculator phone-gate automation (built separately) already fires when a member accesses the calculator. Survey-based routing would extend the same logic to trigger from the survey submission instead — reaching members even before they open a calculator.
+      </div>
+    </section>
+
+  </div><!-- /body -->
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>Utah REIA — Internal Use Only</span>
+    <span>Prepared April 14, 2026</span>
+    <span class="no-print" style="color:#0055cc; cursor:pointer; font-weight:600;" onclick="window.print()">&#128438; Print / Save as PDF</span>
+  </div>
+
+</div>
+</body>
+</html>
