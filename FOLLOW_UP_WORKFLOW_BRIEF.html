@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Utah REIA — Calculator Follow-Up Workflow Brief</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 14px;
+      color: #1a1a2e;
+      background: #f5f7fa;
+      padding: 40px 20px;
+    }
+
+    .page {
+      max-width: 820px;
+      margin: 0 auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: #001F3F;
+      color: #fff;
+      padding: 36px 40px 28px;
+    }
+    .header .label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #7ecba1;
+      margin-bottom: 8px;
+    }
+    .header h1 {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .header .subtitle {
+      font-size: 13px;
+      color: #b0c4d8;
+    }
+    .header .meta {
+      margin-top: 18px;
+      display: flex;
+      gap: 24px;
+      font-size: 12px;
+      color: #7ecba1;
+    }
+
+    /* ── Body ── */
+    .body { padding: 36px 40px; }
+
+    section { margin-bottom: 36px; }
+
+    h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #001F3F;
+      border-bottom: 2px solid #e8edf2;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+    }
+
+    h3 {
+      font-size: 13px;
+      font-weight: 700;
+      color: #2E8B57;
+      margin-bottom: 8px;
+      margin-top: 16px;
+    }
+
+    p { line-height: 1.7; color: #333; margin-bottom: 10px; }
+
+    ul { padding-left: 20px; margin-bottom: 10px; }
+    ul li { line-height: 1.8; color: #333; }
+
+    /* ── Workflow diagram boxes ── */
+    .flow {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0;
+      margin: 16px 0;
+    }
+    .flow-step {
+      background: #f0f6ff;
+      border: 1.5px solid #c3d9f7;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: #1a2a4f;
+      min-width: 130px;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .flow-step.trigger { background: #001F3F; color: #fff; border-color: #001F3F; }
+    .flow-step.action  { background: #e8f5ee; border-color: #2E8B57; color: #1a3a2a; }
+    .flow-step.result  { background: #fff8e1; border-color: #f0a500; color: #5a3e00; }
+    .arrow {
+      font-size: 20px;
+      color: #aaa;
+      padding: 0 6px;
+    }
+
+    /* ── Two-column layout ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* ── Info box ── */
+    .info-box {
+      background: #f0f6ff;
+      border-left: 4px solid #001F3F;
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin: 12px 0;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .info-box.green  { background: #e8f5ee; border-color: #2E8B57; }
+    .info-box.yellow { background: #fffbe6; border-color: #f0a500; }
+
+    /* ── Code / URL ── */
+    code {
+      background: #f0f2f5;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: #c0392b;
+      word-break: break-all;
+    }
+
+    .env-block {
+      background: #1a1a2e;
+      color: #7ecba1;
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-family: 'Courier New', monospace;
+      font-size: 12.5px;
+      margin: 10px 0;
+      line-height: 1.8;
+    }
+    .env-block span { color: #f0a500; }
+
+    /* ── Calculator URL table ── */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 10px 0;
+    }
+    th {
+      background: #001F3F;
+      color: #fff;
+      text-align: left;
+      padding: 9px 12px;
+      font-weight: 600;
+    }
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #eef0f3;
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: #f8fafc; }
+    td a { color: #0055cc; text-decoration: none; font-size: 12px; }
+
+    /* ── Checklist ── */
+    .checklist { list-style: none; padding: 0; }
+    .checklist li {
+      padding: 7px 0 7px 28px;
+      border-bottom: 1px solid #f0f2f5;
+      position: relative;
+      color: #333;
+      font-size: 13px;
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .checklist li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 10px;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #2E8B57;
+      border-radius: 3px;
+    }
+    .checklist li .tag {
+      display: inline-block;
+      background: #e8f5ee;
+      color: #2E8B57;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-left: 8px;
+      text-transform: uppercase;
+    }
+    .checklist li .tag.ghl  { background: #fff0e6; color: #c05000; }
+    .checklist li .tag.code { background: #e8eeff; color: #2040a0; }
+
+    /* ── Footer ── */
+    .footer {
+      background: #f5f7fa;
+      border-top: 1px solid #e8edf2;
+      padding: 18px 40px;
+      font-size: 11px;
+      color: #888;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    @media print {
+      body { background: #fff; padding: 0; }
+      .page { box-shadow: none; border-radius: 0; }
+      .no-print { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- ══ HEADER ══ -->
+  <div class="header">
+    <div class="label">Utah REIA — Internal Tech Brief</div>
+    <h1>Calculator Follow-Up Workflow</h1>
+    <div class="subtitle">Automated behavior-based follow-up via GoHighLevel — triggered by PDF downloads and Home Depot link clicks</div>
+    <div class="meta">
+      <span>Date: April 14, 2026</span>
+      <span>Status: Code Complete — GHL Setup Pending</span>
+      <span>Applies to: All 5 Calculators</span>
+    </div>
+  </div>
+
+  <!-- ══ BODY ══ -->
+  <div class="body">
+
+    <!-- Overview -->
+    <section>
+      <h2>Overview</h2>
+      <p>
+        This document describes the two automated follow-up workflows built for the Utah REIA calculator suite.
+        The goal is to send relevant content to members based on what they are actively doing inside the calculators —
+        without any manual outreach required.
+      </p>
+      <div class="info-box">
+        <strong>The logic in plain English:</strong><br>
+        If a member downloads a deal report PDF &rarr; send them the Home Depot Pro resource.<br>
+        If they then click the Home Depot link &rarr; send them all the calculator tools + AI Rehab Estimator.
+      </div>
+    </section>
+
+    <!-- Workflow 1 -->
+    <section>
+      <h2>Workflow 1 — PDF Download &rarr; Home Depot Follow-Up</h2>
+
+      <h3>Trigger</h3>
+      <p>Member clicks the <strong>"Download PDF Report"</strong> button on any of the 5 calculators after analyzing a deal.</p>
+
+      <h3>Flow</h3>
+      <div class="flow">
+        <div class="flow-step trigger">Member clicks<br><strong>Download PDF</strong></div>
+        <div class="arrow">›</div>
+        <div class="flow-step">Calculator fires<br>webhook to Vercel</div>
+        <div class="arrow">›</div>
+        <div class="flow-step">Vercel forwards to<br>GHL inbound webhook</div>
+        <div class="arrow">›</div>
+        <div class="flow-step action">GHL looks up contact<br>by phone number</div>
+        <div class="arrow">›</div>
+        <div class="flow-step result">Sends Home Depot<br>email / SMS</div>
+      </div>
+
+      <h3>What is sent to GHL</h3>
+      <div class="env-block">
+        &#123; <span>"phone"</span>: "8015551234", <span>"calculator"</span>: "Fix &amp; Flip", <span>"event"</span>: "pdf_download" &#125;
+      </div>
+
+      <h3>GHL Message Content</h3>
+      <div class="info-box green">
+        Hey [First Name], since you're analyzing deals, check out Utah REIA's Home Depot Pro program to save on materials:<br><br>
+        <strong>https://utahreia.org/home-depot</strong>
+      </div>
+
+      <h3>Applies to these calculators</h3>
+      <table>
+        <tr><th>Calculator</th><th>Value sent as "calculator"</th></tr>
+        <tr><td>Fix &amp; Flip</td><td><code>Fix &amp; Flip</code></td></tr>
+        <tr><td>BRRRR</td><td><code>BRRRR</code></td></tr>
+        <tr><td>Rental</td><td><code>Rental</code></td></tr>
+        <tr><td>Short-Term Rental</td><td><code>Short-Term Rental</code></td></tr>
+        <tr><td>Wholesale</td><td><code>Wholesale</code></td></tr>
+      </table>
+    </section>
+
+    <!-- Workflow 2 -->
+    <section>
+      <h2>Workflow 2 — Home Depot Click &rarr; Calculators + Rehab Estimator</h2>
+
+      <h3>Trigger</h3>
+      <p>Member clicks the Home Depot link (<code>https://utahreia.org/home-depot</code>) inside the message sent by Workflow 1. GHL tracks this automatically.</p>
+
+      <h3>Flow</h3>
+      <div class="flow">
+        <div class="flow-step trigger">Member clicks<br><strong>Home Depot link</strong></div>
+        <div class="arrow">›</div>
+        <div class="flow-step action">GHL detects<br>link click event</div>
+        <div class="arrow">›</div>
+        <div class="flow-step result">Sends all calculator<br>links + AI Estimator</div>
+      </div>
+
+      <h3>GHL Message Content</h3>
+      <div class="info-box green">
+        Hey [First Name], glad you're checking out the Home Depot Pro program! While you're analyzing deals, here are all the Utah REIA tools to run your numbers:<br><br>
+        <strong>Deal Calculators:</strong><br>
+        Fix &amp; Flip &rarr; https://utahreia.org/fixandflip-calculator<br>
+        BRRRR &rarr; https://utahreia.org/brrrr-calculator-page<br>
+        Rental &rarr; https://utahreia.org/rental-calculator-page<br>
+        Short-Term Rental &rarr; https://utahreia.org/short-term-calculator-page<br>
+        Wholesale &rarr; https://utahreia.org/wholesale-calculator-page<br><br>
+        <strong>AI Rehab Estimator</strong> — get an instant scope &amp; cost estimate:<br>
+        https://utahreia.org/build-scope-ai-estimator
+      </div>
+    </section>
+
+    <!-- Technical Changes -->
+    <section>
+      <h2>What Was Built (Technical)</h2>
+      <p>Two things were changed in the code. You do not need to touch the code — this section is for reference only.</p>
+
+      <h3>1. New Vercel API Endpoints</h3>
+      <p>Two new serverless functions were created — one for each Vercel project:</p>
+      <div class="two-col">
+        <div class="info-box">
+          <strong>Calculators app</strong><br>
+          <code>Calculators/api/track-event.js</code><br><br>
+          Used by: Fix &amp; Flip, BRRRR, Rental, Short-Term
+        </div>
+        <div class="info-box">
+          <strong>Wholesale app</strong><br>
+          <code>api/track-event.js</code><br><br>
+          Used by: Wholesale Calculator
+        </div>
+      </div>
+      <p>These endpoints receive the event from the calculator and forward it to the GHL webhook. They require one environment variable to be set in Vercel (see Setup Checklist below).</p>
+
+      <h3>2. Calculator HTML Changes</h3>
+      <p>Each of the 5 calculator HTML files received two small changes:</p>
+      <ul>
+        <li><strong>Phone gate:</strong> When the member unlocks the calculator, their phone number is saved in memory (not in browser storage) so it can be used later.</li>
+        <li><strong>PDF button:</strong> When the member clicks "Download PDF", the calculator silently sends their phone + calculator name to the Vercel endpoint. This never blocks or delays the PDF download.</li>
+      </ul>
+      <div class="info-box yellow">
+        <strong>Privacy note:</strong> The phone number is held only in the page's JavaScript memory — it is never written to browser storage (localStorage or sessionStorage). It disappears the moment the tab is closed.
+      </div>
+    </section>
+
+    <!-- Setup Checklist -->
+    <section>
+      <h2>Setup Checklist — What Still Needs to Be Done</h2>
+      <p>The code is deployed. The following steps need to be completed in GHL and Vercel before the workflows go live.</p>
+
+      <ul class="checklist">
+        <li>
+          Create GHL "PDF Download Follow-up" workflow with an <strong>Inbound Webhook</strong> trigger
+          <span class="tag ghl">GHL</span>
+        </li>
+        <li>
+          Copy the GHL webhook URL and add it as an environment variable in <strong>both Vercel projects</strong>:
+          <span class="tag code">Vercel</span>
+          <br>
+          <div class="env-block" style="margin-top:8px;">
+            <span>GHL_PDF_DOWNLOAD_WEBHOOK_URL</span> = https://services.leadconnectorhq.com/hooks/...
+          </div>
+        </li>
+        <li>
+          Add the Home Depot follow-up message to the GHL workflow action (use message content from Workflow 1 section above)
+          <span class="tag ghl">GHL</span>
+        </li>
+        <li>
+          Publish the GHL "PDF Download Follow-up" workflow
+          <span class="tag ghl">GHL</span>
+        </li>
+        <li>
+          Create GHL "Home Depot Click" workflow with a <strong>Link Clicked</strong> trigger (filter to <code>https://utahreia.org/home-depot</code>)
+          <span class="tag ghl">GHL</span>
+        </li>
+        <li>
+          Add the calculator + Rehab Estimator follow-up message (use content from Workflow 2 section above)
+          <span class="tag ghl">GHL</span>
+        </li>
+        <li>
+          Publish the GHL "Home Depot Click" workflow
+          <span class="tag ghl">GHL</span>
+        </li>
+        <li>
+          Test by downloading a PDF on one calculator and confirming the GHL workflow fires
+          <span class="tag ghl">GHL</span>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Calculator URLs Reference -->
+    <section>
+      <h2>Calculator Public URLs (Reference)</h2>
+      <table>
+        <tr><th>Calculator</th><th>Public URL</th></tr>
+        <tr><td>Fix &amp; Flip</td><td><a href="https://utahreia.org/fixandflip-calculator">https://utahreia.org/fixandflip-calculator</a></td></tr>
+        <tr><td>BRRRR</td><td><a href="https://utahreia.org/brrrr-calculator-page">https://utahreia.org/brrrr-calculator-page</a></td></tr>
+        <tr><td>Rental</td><td><a href="https://utahreia.org/rental-calculator-page">https://utahreia.org/rental-calculator-page</a></td></tr>
+        <tr><td>Short-Term Rental</td><td><a href="https://utahreia.org/short-term-calculator-page">https://utahreia.org/short-term-calculator-page</a></td></tr>
+        <tr><td>Wholesale</td><td><a href="https://utahreia.org/wholesale-calculator-page">https://utahreia.org/wholesale-calculator-page</a></td></tr>
+        <tr><td>AI Rehab Estimator</td><td><a href="https://utahreia.org/build-scope-ai-estimator">https://utahreia.org/build-scope-ai-estimator</a></td></tr>
+        <tr><td>Home Depot Resource</td><td><a href="https://utahreia.org/home-depot">https://utahreia.org/home-depot</a></td></tr>
+      </table>
+    </section>
+
+  </div><!-- /body -->
+
+  <!-- ══ FOOTER ══ -->
+  <div class="footer">
+    <span>Utah REIA — Internal Use Only</span>
+    <span>Prepared April 14, 2026</span>
+    <span class="no-print" style="color:#0055cc; cursor:pointer;" onclick="window.print()">&#128438; Print / Save as PDF</span>
+  </div>
+
+</div><!-- /page -->
+
+</body>
+</html>

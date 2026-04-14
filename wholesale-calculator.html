@@ -2287,6 +2287,15 @@
       const x = (pageWidth - rw) / 2, y = (pageHeight - rh) / 2;
       pdf.addImage(img, 'JPEG', x, y, rw, rh);
       pdf.save('UTAHREIA_Wholesale_Report.pdf');
+      // Track PDF download → triggers Home Depot follow-up in GHL
+      const _trackedPhone = _verifiedPhone;
+      if (_trackedPhone) {
+        fetch('https://wholesale-calculator-gules.vercel.app/api/track-event', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone: _trackedPhone, calculator: 'Wholesale', event: 'pdf_download' })
+        }).catch(() => {});
+      }
     }
 
     /* ==================== INIT ==================== */
@@ -2420,6 +2429,9 @@
     });
 
     /* ==================== PHONE GATE ==================== */
+    // In-memory only — cleared on tab close, never written to any storage
+    let _verifiedPhone = null;
+
     function normalizePhone(raw) { return String(raw || '').replace(/[^\d]/g, '').slice(-10); }
 
     async function verifyPhoneViaWorkflow(phone) {
@@ -2466,6 +2478,7 @@
           sessionStorage.setItem('utahreia_trial_days_left', res.daysLeft);
         }
         sessionStorage.setItem('utahreia_calc_verified', 'true');
+        _verifiedPhone = normalizePhone(p);
         unlockCalc();
         if (res.status === 'Trial') {
           const trialReminder = document.getElementById('trialReminder');
