@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(claude mcp *)",
+      "Bash(timeout 5 node index.js)",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(gh repo *)",
+      "Bash(cmd.exe /c \"gh repo create UtahREIA/ghl-mcp-remote --public --source=. --remote=origin --push\")",
+      "Bash(cmd.exe /c \"gh repo create UtahREIA/ghl-mcp-remote --public --source=. --remote=origin --push > output.txt 2>&1\")",
+      "Bash(powershell.exe -Command \"cd 'c:/Users/david/Downloads/ghl-mcp-remote'; gh repo create UtahREIA/ghl-mcp-remote --public --source=. --remote=origin --push\")"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\david\\Downloads",
+      "C:\\Users\\david\\.claude",
+      "c:\\Users\\david\\Downloads\\ghl-mcp-remote"
+    ]
+  }
+}
