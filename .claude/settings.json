@@ -10,7 +10,10 @@
       "Bash(gh repo *)",
       "Bash(cmd.exe /c \"gh repo create UtahREIA/ghl-mcp-remote --public --source=. --remote=origin --push\")",
       "Bash(cmd.exe /c \"gh repo create UtahREIA/ghl-mcp-remote --public --source=. --remote=origin --push > output.txt 2>&1\")",
-      "Bash(powershell.exe -Command \"cd 'c:/Users/david/Downloads/ghl-mcp-remote'; gh repo create UtahREIA/ghl-mcp-remote --public --source=. --remote=origin --push\")"
+      "Bash(powershell.exe -Command \"cd 'c:/Users/david/Downloads/ghl-mcp-remote'; gh repo create UtahREIA/ghl-mcp-remote --public --source=. --remote=origin --push\")",
+      "mcp__claude_ai_Vercel__list_projects",
+      "mcp__claude_ai_Vercel__list_deployments",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' -X POST https://ghl-mcp-remote.vercel.app/api/mcp -H 'Content-Type: application/json' -d '{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"test\",\"version\":\"1.0\"}}}')"
     ],
     "additionalDirectories": [
       "c:\\Users\\david\\Downloads",
