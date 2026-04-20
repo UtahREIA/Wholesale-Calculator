@@ -34,13 +34,22 @@
       "Bash(node -e \"let d=''; process.stdin.on\\('data',c=>d+=c\\); process.stdin.on\\('end',\\(\\)=>{ const j=JSON.parse\\(d\\); const withTags=j.contacts.filter\\(c=>c.tags&&c.tags.length>0\\); withTags.slice\\(0,5\\).forEach\\(c=>console.log\\(c.firstName,c.lastName,'| tags:',c.tags\\)\\); console.log\\('total with tags:',withTags.length,'of',j.contacts.length\\); }\\)\")",
       "Bash(curl -s -X POST https://services.leadconnectorhq.com/contacts/search -H 'Authorization: Bearer pit-d69e9efe-abfc-409d-9d70-edd0c8fece68' -H 'Version: 2021-07-28' -H 'Content-Type: application/json' -d '{\"locationId\":\"DNirEjy0ejVwbHsaBYrn\",\"pageLimit\":100,\"page\":1}')",
       "Bash(node -e \"let d=''; process.stdin.on\\('data',c=>d+=c\\); process.stdin.on\\('end',\\(\\)=>{ const j=JSON.parse\\(d\\); console.log\\('count returned:',j.contacts.length,'| meta:',JSON.stringify\\(j.meta||{}\\)\\); }\\)\")",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(git stash *)",
+      "Bash(git pull *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git rebase *)",
+      "Bash(git commit *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\david\\Downloads",
       "C:\\Users\\david\\.claude",
       "c:\\Users\\david\\Downloads\\ghl-mcp-remote",
-      "c:\\Users\\david\\Downloads\\ghl-mcp-remote\\api"
+      "c:\\Users\\david\\Downloads\\ghl-mcp-remote\\api",
+      "c:\\Users\\david\\Downloads\\Wholesale-Calculator"
     ]
   }
 }
