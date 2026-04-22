@@ -44,7 +44,17 @@
       "Bash(git rebase *)",
       "Bash(git commit *)",
       "Bash(git submodule *)",
-      "Bash(git ls-tree *)"
+      "Bash(git ls-tree *)",
+      "Bash(curl -s -X POST https://services.leadconnectorhq.com/hooks/DNirEjy0ejVwbHsaBYrn/webhook-trigger/a724fc80-17e5-4c31-9820-40db2cd808be -H 'Content-Type: application/json' -d '{\"phone\":\"8015550000\",\"calculator\":\"Wholesale\",\"event\":\"finish_analysis\",\"timestamp\":\"2026-04-22T00:00:00.000Z\"}')",
+      "Bash(curl -s -X POST https://services.leadconnectorhq.com/hooks/DNirEjy0ejVwbHsaBYrn/webhook-trigger/a724fc80-17e5-4c31-9820-40db2cd808be -H 'Content-Type: application/json' -d '{\"phone\":\"8015550000\",\"calculator\":\"Fix & Flip\",\"event\":\"finish_analysis\",\"timestamp\":\"2026-04-22T00:00:00.000Z\"}')",
+      "Bash(curl -s -X POST https://services.leadconnectorhq.com/hooks/DNirEjy0ejVwbHsaBYrn/webhook-trigger/a724fc80-17e5-4c31-9820-40db2cd808be -H 'Content-Type: application/json' -d '{\"phone\":\"8015550000\",\"calculator\":\"BRRRR\",\"event\":\"finish_analysis\",\"timestamp\":\"2026-04-22T00:00:00.000Z\"}')",
+      "Bash(curl -s -X POST https://services.leadconnectorhq.com/hooks/DNirEjy0ejVwbHsaBYrn/webhook-trigger/a724fc80-17e5-4c31-9820-40db2cd808be -H 'Content-Type: application/json' -d '{\"phone\":\"8015550000\",\"calculator\":\"Rental\",\"event\":\"finish_analysis\",\"timestamp\":\"2026-04-22T00:00:00.000Z\"}')",
+      "Bash(curl -s -X POST https://services.leadconnectorhq.com/hooks/DNirEjy0ejVwbHsaBYrn/webhook-trigger/a724fc80-17e5-4c31-9820-40db2cd808be -H 'Content-Type: application/json' -d '{\"phone\":\"8015550000\",\"calculator\":\"Short-Term Rental\",\"event\":\"finish_analysis\",\"timestamp\":\"2026-04-22T00:00:00.000Z\"}')",
+      "Bash(curl -s -X POST https://services.leadconnectorhq.com/hooks/DNirEjy0ejVwbHsaBYrn/webhook-trigger/a724fc80-17e5-4c31-9820-40db2cd808be -H 'Content-Type: application/json' -d '{\"phone\":\"+18015550000\",\"calculator\":\"Wholesale\",\"event\":\"finish_analysis\",\"timestamp\":\"2026-04-22T00:00:00.000Z\"}')",
+      "Bash(curl -s -X POST https://services.leadconnectorhq.com/hooks/DNirEjy0ejVwbHsaBYrn/webhook-trigger/a724fc80-17e5-4c31-9820-40db2cd808be -H 'Content-Type: application/json' -d '{\"phone\":\"+18015550000\",\"calculator\":\"Fix & Flip\",\"event\":\"finish_analysis\",\"timestamp\":\"2026-04-22T00:00:00.000Z\"}')",
+      "Bash(curl -s -X POST https://services.leadconnectorhq.com/hooks/DNirEjy0ejVwbHsaBYrn/webhook-trigger/a724fc80-17e5-4c31-9820-40db2cd808be -H 'Content-Type: application/json' -d '{\"phone\":\"+18015550000\",\"calculator\":\"BRRRR\",\"event\":\"finish_analysis\",\"timestamp\":\"2026-04-22T00:00:00.000Z\"}')",
+      "Bash(curl -s -X POST https://services.leadconnectorhq.com/hooks/DNirEjy0ejVwbHsaBYrn/webhook-trigger/a724fc80-17e5-4c31-9820-40db2cd808be -H 'Content-Type: application/json' -d '{\"phone\":\"+18015550000\",\"calculator\":\"Rental\",\"event\":\"finish_analysis\",\"timestamp\":\"2026-04-22T00:00:00.000Z\"}')",
+      "Bash(curl -s -X POST https://services.leadconnectorhq.com/hooks/DNirEjy0ejVwbHsaBYrn/webhook-trigger/a724fc80-17e5-4c31-9820-40db2cd808be -H 'Content-Type: application/json' -d '{\"phone\":\"+18015550000\",\"calculator\":\"Short-Term Rental\",\"event\":\"finish_analysis\",\"timestamp\":\"2026-04-22T00:00:00.000Z\"}')"
     ],
     "additionalDirectories": [
       "c:\\Users\\david\\Downloads",
