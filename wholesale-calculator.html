@@ -2329,15 +2329,6 @@
       const x = (pageWidth - rw) / 2, y = (pageHeight - rh) / 2;
       pdf.addImage(img, 'JPEG', x, y, rw, rh);
       pdf.save('UTAHREIA_Wholesale_Report.pdf');
-      // Track PDF download → triggers Home Depot follow-up in GHL
-      const _trackedPhone = _verifiedPhone;
-      if (_trackedPhone) {
-        fetch('https://wholesale-calculator-gules.vercel.app/api/track-event', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone: _trackedPhone, calculator: 'Wholesale', event: 'pdf_download' })
-        }).catch(() => {});
-      }
     }
 
     /* ==================== INIT ==================== */
@@ -2347,7 +2338,16 @@
       $('prevBtn').addEventListener('click', () => showStep(currentStep - 1));
       $('nextBtn').addEventListener('click', () => showStep(currentStep + 1));
       const finishBtn = $('finishAnalysisBtn');
-      if (finishBtn) finishBtn.addEventListener('click', computeAndRender);
+      if (finishBtn) finishBtn.addEventListener('click', () => {
+        computeAndRender();
+        if (_verifiedPhone) {
+          fetch('https://wholesale-calculator-gules.vercel.app/api/track-event', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: _verifiedPhone, calculator: 'Wholesale', event: 'finish_analysis' })
+          }).catch(() => {});
+        }
+      });
 
       // Clear blank fields
       ['repairs', 'purchaseClosing', 'holdingMonthly', 'purchasePrice', 'wholesaleFee', 'arv'].forEach(id => {

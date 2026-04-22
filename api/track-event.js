@@ -4,14 +4,14 @@
 // to a GHL inbound webhook to trigger automated follow-up workflows.
 //
 // Currently handled events:
-//   pdf_download — user clicked "Download PDF" after analyzing a deal
+//   finish_analysis — user clicked "Finish Analysis" after completing a deal
 //
 // Required env var:
-//   GHL_PDF_DOWNLOAD_WEBHOOK_URL — GHL inbound webhook URL for the
-//                                  "PDF Download Follow-up" workflow
+//   GHL_FINISH_ANALYSIS_WEBHOOK_URL — GHL inbound webhook URL for the
+//                                     "Finish Analysis Follow-up" workflow
 //
 // Payload accepted (POST JSON):
-//   { phone: "8015551234", calculator: "Wholesale", event: "pdf_download" }
+//   { phone: "8015551234", calculator: "Wholesale", event: "finish_analysis" }
 
 export default async function handler(req, res) {
   // CORS preflight
@@ -34,9 +34,10 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Missing required fields: phone, calculator, event' });
   }
 
-  const webhookUrl = process.env.GHL_PDF_DOWNLOAD_WEBHOOK_URL;
+  const webhookUrl = process.env.GHL_FINISH_ANALYSIS_WEBHOOK_URL
+                  || process.env.GHL_PDF_DOWNLOAD_WEBHOOK_URL; // fallback during transition
   if (!webhookUrl) {
-    console.warn('GHL_PDF_DOWNLOAD_WEBHOOK_URL not set — skipping event tracking');
+    console.warn('GHL_FINISH_ANALYSIS_WEBHOOK_URL not set — skipping event tracking');
     return res.status(200).json({ ok: true, tracked: false });
   }
 
