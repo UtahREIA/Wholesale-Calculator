@@ -1186,7 +1186,7 @@
             placeholder="$25,000" type="text" /></div>
         <div class="toggle-row">
           <label class="toggle-label">Manual only
-            <label class="switch"><input id="rehabManualToggle" type="checkbox" /><span class="slider"></span></label>
+            <label class="switch"><input id="rehabManualToggle" type="checkbox" checked /><span class="slider"></span></label>
           </label>
           <span class="muted-small">OFF = use itemized breakdown below</span>
         </div>
@@ -1336,6 +1336,9 @@
         <div
           style="background:#eef2fa;border-left:4px solid var(--blue);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:#333;line-height:1.6">
           <strong style="color:var(--blue)">Your MAO result:</strong> All costs have been entered. The calculator works backwards from your ARV (entered in Step 2) - subtracting every cost layer and your wholesale fee - to find the <strong>Maximum Allowable Offer (MAO)</strong>: the highest price you can offer the seller so the deal still works for everyone.
+          <div style="margin-top:8px;padding:8px 10px;background:#fff;border-radius:6px;border:1px solid #c7d7f5;color:var(--blue);font-size:12px">
+            ✏️ <strong>You can adjust your Wholesale Purchase Price and Buyer's Profit directly below</strong> - no need to go back to earlier steps. All numbers will update instantly.
+          </div>
         </div>
 
         <div class="row">
@@ -1362,6 +1365,28 @@
           <div id="maoDisplayBox" style="color:var(--gold);font-size:28px;font-weight:800;white-space:nowrap">-</div>
         </div>
 
+        <!-- Live Adjustment Fields -->
+        <div class="row" style="margin-bottom:14px">
+          <div class="field">
+            <label>Wholesale Purchase Price ✏️</label>
+            <input id="step8PurchasePrice" placeholder="$200,000" type="text"
+              style="font-weight:700;color:var(--blue);border:2px solid #c7d7f5;background:#f8faff" />
+            <div class="muted-small" style="margin-top:3px">✏️ Editable - syncs with Step 2. Change your offer to see updated profit.</div>
+          </div>
+          <div class="field">
+            <label>Buyer's Profit ✏️</label>
+            <input id="step8BuyerProfit" placeholder="$30,000" type="text"
+              style="font-weight:700;color:var(--blue);border:2px solid #c7d7f5;background:#f8faff" />
+            <div class="muted-small" style="margin-top:3px">✏️ Editable - syncs with Step 2. Adjust investor profit to see updated MAO.</div>
+          </div>
+          <div class="field">
+            <label>Wholesaler Profit <span style="font-weight:400;color:var(--muted)">(auto-calculated)</span></label>
+            <input id="wholesalerProfit" type="text" readonly
+              style="background:#f0fff4;font-weight:700;color:var(--green);font-size:17px" />
+            <div class="muted-small" style="margin-top:3px">Investor's Purchase Price - Your Offer to Seller.</div>
+          </div>
+        </div>
+
         <!-- 70% Rule Quick Check -->
         <div class="info-box">
           <div style="font-weight:700;color:var(--blue);font-size:13px;margin-bottom:6px">⚡ 70% Rule Quick Check</div>
@@ -1376,7 +1401,7 @@
                 under.</div>
             </div>
             <div class="field">
-              <label>Your Offer to Seller <span style="font-weight:400;color:var(--muted)">(from Step 1)</span></label>
+              <label>Your Offer to Seller (Wholesale Purchase Price) <span style="font-weight:400;color:var(--muted)">(from Step 2)</span></label>
               <input id="rule70YourMao" type="text" readonly
                 style="background:#fff;font-weight:700;color:var(--blue)" />
               <div class="muted-small" style="margin-top:3px">Your actual offer - should stay at or below the MAO.</div>
@@ -1697,7 +1722,7 @@
   <script>
     /* ==================== STATE ==================== */
     const editorState = {
-      rehabExtras: 0, rehabManualBase: 0, rehabManualOnly: false,
+      rehabExtras: 0, rehabManualBase: 0, rehabManualOnly: true,
       purchaseExtrasUpfront: 0, purchaseExtrasRolled: 0, purchaseManualBase: 0, purchaseManualOnly: false,
       holdingMonthlyBase: 0, holdingMonthlyExtras: 0, holdingManualOnly: false,
       salesExtras: 0,
@@ -2054,6 +2079,23 @@
       const investorPrice = Math.max(0, mao) + fee;
       const assignmentFee = investorPrice - purchasePrice;
 
+      // Sync step8PurchasePrice with purchasePrice field
+      const step8PP = $('step8PurchasePrice');
+      if (step8PP && document.activeElement !== step8PP) {
+        step8PP.value = purchasePrice ? fc(purchasePrice) : '';
+      }
+
+      // Sync step8BuyerProfit with flipperProfit field
+      const step8BuyerProfit = $('step8BuyerProfit');
+      if (step8BuyerProfit && document.activeElement !== step8BuyerProfit) {
+        const bp = uc($('flipperProfit').value) || 0;
+        step8BuyerProfit.value = bp ? fc(bp) : '';
+      }
+
+      // Wholesaler Profit = Investor Price - Your Offer to Seller
+      const wholesalerProfit = investorPrice - purchasePrice;
+      if ($('wholesalerProfit')) $('wholesalerProfit').value = arv ? fc(wholesalerProfit) : '-';
+
       if ($('investorPurchasePrice')) $('investorPurchasePrice').value = arv ? fc(investorPrice) : '-';
       if ($('rule70Mao')) $('rule70Mao').value = arv ? fc(rule70) : '-';
       if ($('rule70YourMao')) $('rule70YourMao').value = purchasePrice ? fc(purchasePrice) : '-';
@@ -2315,7 +2357,7 @@
       // Manual toggles
       [['rehabManualToggle', 'rehabManualOnly'], ['purchaseManualToggle', 'purchaseManualOnly'], ['holdingManualToggle', 'holdingManualOnly']].forEach(([tid, sk]) => {
         const t = $(tid); if (!t) return;
-        t.checked = false;
+        t.checked = tid === 'rehabManualToggle' ? true : false;
         t.addEventListener('change', () => { editorState[sk] = !!t.checked; updateVisibleTotals(); updateStep3(); });
       });
 
@@ -2414,6 +2456,44 @@
         const el = $(id);
         if (el) el.addEventListener('input', () => { recalcAllEditors(); updateVisibleTotals(); updateStep3(); });
       });
+
+      // Step 8 Wholesale Purchase Price - syncs back to purchasePrice and recalculates
+      if ($('step8PurchasePrice')) {
+        $('step8PurchasePrice').addEventListener('focus', () => {
+          const el = $('step8PurchasePrice');
+          el.value = el.value ? String(uc(el.value)) : '';
+        });
+        $('step8PurchasePrice').addEventListener('input', () => {
+          const raw = uc($('step8PurchasePrice').value);
+          if ($('purchasePrice')) $('purchasePrice').value = raw ? fc(raw) : '';
+          recalcAllEditors(); updateVisibleTotals(); updateStep3();
+        });
+        $('step8PurchasePrice').addEventListener('blur', () => {
+          const raw = uc($('step8PurchasePrice').value);
+          $('step8PurchasePrice').value = raw ? fc(raw) : '';
+          if ($('purchasePrice')) $('purchasePrice').value = raw ? fc(raw) : '';
+          recalcAllEditors(); updateVisibleTotals(); updateStep3();
+        });
+      }
+
+      // Step 8 Buyer's Profit - syncs back to flipperProfit and recalculates
+      if ($('step8BuyerProfit')) {
+        $('step8BuyerProfit').addEventListener('focus', () => {
+          const el = $('step8BuyerProfit');
+          el.value = el.value ? String(uc(el.value)) : '';
+        });
+        $('step8BuyerProfit').addEventListener('input', () => {
+          const raw = uc($('step8BuyerProfit').value);
+          if ($('flipperProfit')) $('flipperProfit').value = raw ? fc(raw) : '';
+          if ($('flipperProfitPct')) $('flipperProfitPct').value = '';
+          recalcAllEditors(); updateVisibleTotals(); updateStep3();
+        });
+        $('step8BuyerProfit').addEventListener('blur', () => {
+          const raw = uc($('step8BuyerProfit').value);
+          $('step8BuyerProfit').value = raw ? fc(raw) : '';
+          recalcAllEditors(); updateVisibleTotals(); updateStep3();
+        });
+      }
 
       // Global change listeners
       document.querySelectorAll('#calcWrap input, #calcWrap select').forEach(el => {
