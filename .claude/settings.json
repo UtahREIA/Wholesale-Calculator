@@ -42,7 +42,9 @@
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
       "Bash(git rebase *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(git submodule *)",
+      "Bash(git ls-tree *)"
     ],
     "additionalDirectories": [
       "c:\\Users\\david\\Downloads",
