@@ -28,11 +28,15 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { phone, calculator, event } = req.body || {};
+  const { phone: rawPhone, calculator, event } = req.body || {};
 
-  if (!phone || !calculator || !event) {
+  if (!rawPhone || !calculator || !event) {
     return res.status(400).json({ error: 'Missing required fields: phone, calculator, event' });
   }
+
+  // Normalize to E.164 format (+1XXXXXXXXXX) for GHL contact lookup
+  const digits = String(rawPhone).replace(/\D/g, '').slice(-10);
+  const phone = `+1${digits}`;
 
   const webhookUrl = process.env.GHL_FINISH_ANALYSIS_WEBHOOK_URL
                   || process.env.GHL_PDF_DOWNLOAD_WEBHOOK_URL; // fallback during transition
