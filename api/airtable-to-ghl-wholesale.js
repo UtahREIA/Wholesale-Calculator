@@ -6,7 +6,7 @@ export default async function handler(req, res) {
       return res.status(405).json({ error: "Method not allowed" });
     }
 
-    const { phone, email, name, calculator = "Wholesale", lastAccessAt } = req.body || {};
+    const { phone, email, name, calculator = "Wholesale", firstAccessAt } = req.body || {};
 
     const normalizedPhone = normalizePhone(phone);
 
@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     const CF_CALC_USER_ID = process.env.CF_CALC_USER_ID;
 
     const CF_CALC_NAME_ID = process.env.CF_CALC_NAME_ID; // optional
-    const CF_LAST_ACCESS_ID = process.env.CF_LAST_ACCESS_ID; // optional
+    const CF_FIRST_ACCESS_ID = process.env.CF_FIRST_ACCESS_ID; // optional
 
     if (!TOKEN || !LOCATION_ID || !CF_CALC_USER_ID) {
       return res.status(500).json({
@@ -87,10 +87,10 @@ export default async function handler(req, res) {
       customFields.push({ id: CF_CALC_NAME_ID, value: String(calculator) });
     }
 
-    if (CF_LAST_ACCESS_ID) {
+    if (CF_FIRST_ACCESS_ID) {
       customFields.push({
-        id: CF_LAST_ACCESS_ID,
-        value: lastAccessAt || new Date().toISOString()
+        id: CF_FIRST_ACCESS_ID,
+        value: firstAccessAt || new Date().toISOString()
       });
     }
 

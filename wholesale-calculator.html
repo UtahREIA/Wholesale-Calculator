@@ -1387,6 +1387,9 @@
           </div>
         </div>
 
+        <!-- Profit vs Original Fee Indicator -->
+        <div id="profitIndicator" style="display:none;border-radius:8px;padding:12px 16px;margin-bottom:14px;font-size:14px;font-weight:600;text-align:center"></div>
+
         <!-- 70% Rule Quick Check -->
         <div class="info-box">
           <div style="font-weight:700;color:var(--blue);font-size:13px;margin-bottom:6px">⚡ 70% Rule Quick Check</div>
@@ -2096,6 +2099,26 @@
       const wholesalerProfit = investorPrice - purchasePrice;
       if ($('wholesalerProfit')) $('wholesalerProfit').value = arv ? fc(wholesalerProfit) : '-';
 
+      // Green/red profit indicator vs original wholesale fee
+      const profitIndicator = $('profitIndicator');
+      if (profitIndicator && arv > 0 && purchasePrice > 0 && fee > 0) {
+        profitIndicator.style.display = 'block';
+        if (wholesalerProfit >= fee) {
+          profitIndicator.style.background = '#f0fff4';
+          profitIndicator.style.color = '#276749';
+          profitIndicator.style.border = '1px solid #c6f6d5';
+          profitIndicator.textContent = '✅ Your profit of ' + fc(wholesalerProfit) + ' is at or above your original wholesale fee of ' + fc(fee) + '.';
+        } else {
+          const shortfall = fee - wholesalerProfit;
+          profitIndicator.style.background = '#fff5f5';
+          profitIndicator.style.color = '#9b2c2c';
+          profitIndicator.style.border = '1px solid #fed7d7';
+          profitIndicator.textContent = '⚠️ Your profit of ' + fc(wholesalerProfit) + ' is ' + fc(shortfall) + ' below your original wholesale fee of ' + fc(fee) + '.';
+        }
+      } else if (profitIndicator) {
+        profitIndicator.style.display = 'none';
+      }
+
       if ($('investorPurchasePrice')) $('investorPurchasePrice').value = arv ? fc(investorPrice) : '-';
       if ($('rule70Mao')) $('rule70Mao').value = arv ? fc(rule70) : '-';
       if ($('rule70YourMao')) $('rule70YourMao').value = purchasePrice ? fc(purchasePrice) : '-';
@@ -2145,7 +2168,7 @@
         const sales = editorState.salesExtras || 0;
         const loanAmt = computeAggregatedFinancedAmount();
         const mao = calcMAO();
-        const isGood = mao > 0;
+        const isGood = purchasePrice > 0 ? purchasePrice <= mao : mao > 0;
         const buyerProfit = investorType === 'flipper' ? getBuyerProfit(arv) : 0;
         const allCosts = repairs + closing + holding + sales + buyerProfit;
         const investorPrice = Math.max(0, mao) + fee;
@@ -2206,46 +2229,31 @@
           '</div>';
         rc.appendChild(summary);
 
-        // Cost Breakdown
-        const bk = document.createElement('div'); bk.className = 'card'; bk.style.marginTop = '12px';
-        bk.innerHTML =
-          '<div style="font-weight:700;margin-bottom:10px;color:var(--blue)">Full Cost Breakdown</div>' +
-          '<div class="breakdown-row"><div>ARV</div><div>' + fc(arv) + '</div></div>' +
-          '<div class="breakdown-row"><div>Repairs</div><div>– ' + fc(repairs) + '</div></div>' +
-          '<div class="breakdown-row"><div>Purchase Costs</div><div>– ' + fc(closing) + '</div></div>' +
-          '<div class="breakdown-row"><div>Holding (' + hMonths + ' mo)</div><div>– ' + fc(holding) + '</div></div>' +
-          (interest > 0 ? '<div class="breakdown-row" style="font-size:12px;color:var(--muted)"><div>&nbsp;&nbsp;└ Loan Interest</div><div>– ' + fc(interest) + '</div></div>' : '') +
-          (investorType === 'flipper' ? '<div class="breakdown-row"><div>Selling Costs</div><div>– ' + fc(sales) + '</div></div>' : '') +
-          (investorType === 'flipper' ? '<div class="breakdown-row"><div>Flipper\'s Profit</div><div>– ' + fc(buyerProfit) + '</div></div>' : '') +
-          '<div class="breakdown-row"><div>Wholesale Fee</div><div>– ' + fc(fee) + '</div></div>' +
-          '<div class="breakdown-row total"><div>Max Allowable Offer (MAO)</div><div style="color:' + (isGood ? 'var(--green)' : '#d9534f') + '">' + fc(mao) + '</div></div>' +
-          (sqft > 0 ?
-            '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee">' +
-            '<div style="font-weight:700;margin-bottom:8px;font-size:13px;color:var(--blue)">Per Sq Ft (' + sqft.toLocaleString() + ' sqft)</div>' +
-            '<div class="breakdown-row"><div>MAO / sqft</div><div>' + fc(mao / sqft) + '</div></div>' +
-            '<div class="breakdown-row"><div>Repair / sqft</div><div>' + fc(repairs / sqft) + '</div></div>' +
-            '<div class="breakdown-row"><div>ARV / sqft</div><div>' + fc(arv / sqft) + '</div></div></div>' : '');
-        rc.appendChild(bk);
-
-        // Deal Metrics
-        const dm = document.createElement('div'); dm.className = 'card'; dm.style.marginTop = '12px';
-        dm.innerHTML =
-          '<div style="font-weight:700;margin-bottom:10px;color:var(--blue)">📋 Deal Metrics</div>' +
-          '<div class="breakdown-row"><div>Your Offer to Seller</div><div>' + fc(purchasePrice) + '</div></div>' +
-          '<div class="breakdown-row"><div>Investor Buys From You <span style="font-size:12px;color:var(--muted)">(MAO + your fee)</span></div><div style="font-weight:700;color:var(--blue)">' + fc(investorPrice) + '</div></div>' +
-          '<div class="breakdown-row"><div>Your Wholesale Fee <span style="font-size:12px;color:var(--muted)">(your profit)</span></div><div style="font-weight:700;color:var(--green)">' + fc(fee) + '</div></div>' +
-          '<div class="breakdown-row"><div>Your Profit <span style="font-size:12px;color:var(--muted)">(Investor Price - Your Offer to Seller)</span></div><div style="font-weight:700;color:var(--green)">' + fc(investorPrice - purchasePrice) + '</div></div>' +
-          '<div class="breakdown-row"><div>Total Financing (Loans) <span style="font-size:12px;color:var(--muted)">- amount financed, not your out-of-pocket</span></div><div>' + fc(loanAmt) + '</div></div>' +
-          '<div style="margin-top:14px;padding-top:12px;border-top:1px solid #eee">' +
-          '<div style="font-weight:700;margin-bottom:8px;font-size:13px;color:var(--blue)">⚡ 70% Rule Check</div>' +
-          '<div class="breakdown-row"><div>70% Rule MAO (ARV × 70% − Repairs)</div><div style="font-weight:700">' + fc(rule70) + '</div></div>' +
-          '<div class="breakdown-row"><div>Your MAO</div><div style="font-weight:700">' + fc(mao) + '</div></div>' +
-          (purchasePrice > 0 ? '<div class="breakdown-row"><div>Your Offer to Seller</div><div style="font-weight:700">' + fc(purchasePrice) + '</div></div>' : '') +
-          '<div style="margin-top:8px;padding:10px 12px;border-radius:8px;font-weight:600;font-size:13px;background:' + (rule70Pass ? '#f0fff4' : '#fff5f5') + ';color:' + (rule70Pass ? '#276749' : '#9b2c2c') + '">' +
-          (rule70Pass ? '✅ Your offer is within the MAO - the deal works for everyone.' : '⚠️ Your offer exceeds the MAO. You are offering the seller more than the deal supports. Lower your offer or adjust your costs.') +
+        // Profit Summary
+        const finalProfit = investorPrice - purchasePrice;
+        const profitGood = finalProfit >= fee;
+        const profitColor = profitGood ? '#276749' : '#9b2c2c';
+        const profitBg = profitGood ? '#f0fff4' : '#fff5f5';
+        const profitBorder = profitGood ? '#c6f6d5' : '#fed7d7';
+        const ps = document.createElement('div'); ps.className = 'card'; ps.style.marginTop = '12px';
+        ps.style.background = profitBg;
+        ps.style.border = '1px solid ' + profitBorder;
+        ps.innerHTML =
+          '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">' +
+          '<div>' +
+          '<div style="font-size:12px;color:' + profitColor + ';opacity:0.75;text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:4px">Original Wholesale Profit</div>' +
+          '<div style="font-size:26px;font-weight:800;color:' + profitColor + '">' + fc(fee) + '</div>' +
           '</div>' +
+          '<div style="font-size:22px;color:' + profitColor + ';opacity:0.4;font-weight:300">→</div>' +
+          '<div style="text-align:right">' +
+          '<div style="font-size:12px;color:' + profitColor + ';opacity:0.75;text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:4px">Final Wholesale Profit</div>' +
+          '<div style="font-size:26px;font-weight:800;color:' + profitColor + '">' + fc(finalProfit) + '</div>' +
+          '</div>' +
+          '</div>' +
+          '<div style="margin-top:10px;font-size:13px;font-weight:600;color:' + profitColor + ';text-align:center">' +
+          (profitGood ? '✅ Your final profit is at or above your original wholesale fee.' : '⚠️ Your final profit is ' + fc(fee - finalProfit) + ' below your original wholesale fee.') +
           '</div>';
-        rc.appendChild(dm);
+        rc.appendChild(ps);
 
         // Charts
         const chartsDiv = document.createElement('div'); chartsDiv.className = 'charts';

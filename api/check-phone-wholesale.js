@@ -112,7 +112,6 @@ export default async function handler(req, res) {
     let records = data.records || [];
     if (records.length > 0) {
       const record = records[0];
-      await airtablePatch(record.id, { "Last Access Date": isoToday });
       return res.json({
         valid: true,
         name: record.fields?.Name || "",
@@ -138,7 +137,6 @@ export default async function handler(req, res) {
 
     // If active, unlimited
     if (memberStatus === "active") {
-      await airtablePatch(recordId, { "Last Access Date": isoToday });
       return res.json({ valid: true, name, status: "Active", trial: false });
     }
 
@@ -149,7 +147,7 @@ export default async function handler(req, res) {
     let trialExpired = false;
 
     if (!firstAccess) {
-      await airtablePatch(recordId, { "First Access Date": isoToday, "Last Access Date": isoToday });
+      await airtablePatch(recordId, { "First Access Date": isoToday });
       trialStart = isoToday;
       trialDaysLeft = 30;
     } else {
@@ -160,7 +158,6 @@ export default async function handler(req, res) {
     }
 
     if (!trialExpired) {
-      await airtablePatch(recordId, { "Last Access Date": isoToday });
       return res.json({
         valid: true,
         name,
